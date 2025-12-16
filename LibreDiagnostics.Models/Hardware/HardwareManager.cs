@@ -1,0 +1,403 @@
+﻿/*
+* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*
+* Copyright (c) 2025 Florian K.
+*
+*/
+
+using BlackSharp.Core.Asynchronous;
+using BlackSharp.Core.Collections;
+using BlackSharp.Core.Converters;
+using BlackSharp.Core.Logging;
+using BlackSharp.MVVM.ComponentModel;
+using LibreDiagnostics.Models.Configuration;
+using LibreDiagnostics.Models.Enums;
+using LibreDiagnostics.Models.Globals;
+using LibreDiagnostics.Models.Hardware.HardwareMonitor;
+using LibreDiagnostics.Models.Helper;
+using LibreHardwareMonitor.Hardware;
+
+namespace LibreDiagnostics.Models.Hardware
+{
+    public class HardwareManager : ViewModelBase, IDisposable
+    {
+        #region Constructor
+
+        public HardwareManager()
+        {
+            Global.SettingsChanged += OnSettingsChanged;
+
+            //Initial call to apply settings
+            OnSettingsChanged(this, new(Global.Settings));
+        }
+
+        ~HardwareManager()
+        {
+            Dispose();
+        }
+
+        #endregion
+
+        #region Fields
+
+        bool _Disposed = false;
+
+        Computer _Computer;
+        IHardware _Board;
+
+        object _HardwarePanelsLock = new();
+
+        #endregion
+
+        #region Properties
+
+        ObservableCollectionEx<HardwarePanel> _HardwarePanels;
+        public ObservableCollectionEx<HardwarePanel> HardwarePanels
+        {
+            get { return _HardwarePanels; }
+            set { SetField(ref _HardwarePanels, value); }
+        }
+
+        #endregion
+
+        #region Public
+
+        public void Update()
+        {
+            UpdateBoard();
+
+            using (var guard = new LockGuard(_HardwarePanelsLock))
+            {
+                HardwarePanels.ForEach(hp => hp.Hardware.ForEach(hm => hm.Update()));
+            }
+
+            UpdateMemorySize();
+        }
+
+        public List<HardwareConfig> GetHardware(HardwareMonitorType type)
+        {
+            switch (type)
+            {
+                case HardwareMonitorType.CPU:
+                case HardwareMonitorType.RAM:
+                case HardwareMonitorType.GPU:
+                case HardwareMonitorType.Storage:
+                case HardwareMonitorType.Network:
+                    return GetHardware(HardwareMonitorTypeHelper.GetHardwareTypes(type).ToArray())
+                        .Select(h => new HardwareConfig
+                        {
+                            ID = h.Identifier.ToString(),
+                            Name = h.Name,
+                            ActualName = h.Name
+                        }).ToList();
+                case HardwareMonitorType.Fan:
+                    return GetBoardHardware(HardwareMonitorTypeHelper.GetHardwareTypes(type).ToArray())
+                        .Select(h => new HardwareConfig
+                        {
+                            ID = h.Identifier.ToString(),
+                            Name = h.Name,
+                            ActualName = h.Name
+                        }).ToList();
+                default:
+                    throw new ArgumentException($"Invalid {nameof(HardwareMonitorType)}.");
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!_Disposed)
+            {
+                _Computer.Close();
+            }
+        }
+
+        #endregion
+
+        #region Private
+
+        void UpdateBoard()
+        {
+            _Board.Update();
+
+            _Board.SubHardware?.ToList().ForEach(h => h.Update());
+        }
+
+        IEnumerable<IHardware> GetHardware(params HardwareType[] types)
+        {
+            return _Computer.Hardware.Where(h => types.Contains(h.HardwareType));
+        }
+
+        IEnumerable<IHardware> GetBoardHardware(params HardwareType[] types)
+        {
+            return _Board.SubHardware.Where(h => types.Contains(h.HardwareType));
+        }
+
+        HardwarePanel CreatePanel(HardwareMonitorConfig hardwareMonitorConfig)
+        {
+            var monType = HardwareHardwareMetricKeyTranslator.GetMonitorType(hardwareMonitorConfig.HardwareMonitorType);
+
+            switch (hardwareMonitorConfig.HardwareMonitorType)
+            {
+                case HardwareMonitorType.CPU:
+                    return new HardwarePanel(hardwareMonitorConfig.HardwareMonitorType, IconData.CPU    , monType, HardwareMonitorLoader.GetHardwareMonitorsCPU(_Computer, _Board, hardwareMonitorConfig));
+                case HardwareMonitorType.RAM:                
+                    return new HardwarePanel(hardwareMonitorConfig.HardwareMonitorType, IconData.RAM    , monType, HardwareMonitorLoader.GetHardwareMonitorsRAM(_Computer, _Board, hardwareMonitorConfig));
+                case HardwareMonitorType.GPU:                
+                    return new HardwarePanel(hardwareMonitorConfig.HardwareMonitorType, IconData.GPU    , monType, HardwareMonitorLoader.GetHardwareMonitorsGPU(_Computer, hardwareMonitorConfig));
+                case HardwareMonitorType.Storage:
+                    return new HardwarePanel(hardwareMonitorConfig.HardwareMonitorType, IconData.Drives , monType, HardwareMonitorLoader.GetHardwareMonitorsDrive(_Computer, hardwareMonitorConfig));
+                case HardwareMonitorType.Network:
+                    return new HardwarePanel(hardwareMonitorConfig.HardwareMonitorType, IconData.Network, monType, HardwareMonitorLoader.GetHardwareMonitorsNetwork(_Computer, hardwareMonitorConfig));
+                case HardwareMonitorType.Fan:
+                    return new HardwarePanel(hardwareMonitorConfig.HardwareMonitorType, IconData.Fan    , monType, HardwareMonitorLoader.GetHardwareMonitorsFan(_Computer, _Board, hardwareMonitorConfig));
+                default:
+                    throw new ArgumentException($"Invalid {nameof(HardwareMonitorType)}.");
+            }
+        }
+
+        void OnSettingsChanged(object sender, SettingsChangedEventArgs e)
+        {
+            //Already running - compare if anything has changed and apply differences
+            if (e.NewSettings != null && _Computer != null)
+            {
+                //Adjust order of panels if necessary
+                using (var guard = new LockGuard(_HardwarePanelsLock))
+                {
+                    for (int i = 0; i < e.NewSettings.HardwareMonitorConfigs.Count; ++i)
+                    {
+                        var hmc = e.NewSettings.HardwareMonitorConfigs[i];
+
+                        var index = HardwarePanels.FindIndex(hp => hp.HardwareMonitorType == hmc.HardwareMonitorType);
+
+                        //In config might be more than we show
+                        if (i > index)
+                        {
+                            continue;
+                        }
+
+                        if (index >= 0 && i != index)
+                        {
+                            HardwarePanels.Move(index, i);
+                        }
+                    }
+                }
+
+                e.NewSettings.HardwareMonitorConfigs
+                    .ForEach(cfg =>
+                    {
+                        var addOrRemoveConfig = new Action<HardwareMonitorConfig>(cgf =>
+                        {
+                            using (var guard = new LockGuard(_HardwarePanelsLock))
+                            {
+                                //Create new panel to use new sensors
+                                if (cfg.Enabled)
+                                {
+                                    HardwarePanels.TryInsert(cfg.Order, CreatePanel(cfg));
+                                }
+                                else //Remove panel
+                                {
+                                    HardwarePanels.Remove(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
+                                }
+                            }
+                        });
+
+                        switch (cfg.HardwareMonitorType)
+                        {
+                            case HardwareMonitorType.CPU:
+                                if (_Computer.IsCpuEnabled != cfg.Enabled)
+                                {
+                                    _Computer.IsCpuEnabled = cfg.Enabled;
+                                    addOrRemoveConfig(cfg);
+                                }
+                                break;
+                            case HardwareMonitorType.RAM:
+                                if (_Computer.IsMemoryEnabled != cfg.Enabled)
+                                {
+                                    _Computer.IsMemoryEnabled = cfg.Enabled;
+                                    addOrRemoveConfig(cfg);
+                                }
+                                break;
+                            case HardwareMonitorType.GPU:
+                                if (_Computer.IsGpuEnabled != cfg.Enabled)
+                                {
+                                    _Computer.IsGpuEnabled = cfg.Enabled;
+                                    addOrRemoveConfig(cfg);
+                                }
+                                break;
+                            case HardwareMonitorType.Storage:
+                                if (_Computer.IsStorageEnabled != cfg.Enabled)
+                                {
+                                    _Computer.IsStorageEnabled = cfg.Enabled;
+                                    addOrRemoveConfig(cfg);
+                                }
+                                break;
+                            case HardwareMonitorType.Network:
+                                if (_Computer.IsNetworkEnabled != cfg.Enabled)
+                                {
+                                    _Computer.IsNetworkEnabled = cfg.Enabled;
+                                    addOrRemoveConfig(cfg);
+                                }
+                                break;
+                            case HardwareMonitorType.Fan:
+                                //No specific setting for fans, they are part of Motherboard
+                                break;
+                            default:
+                                break;
+                        }
+
+                        ApplyHardwareConfigChanges(cfg);
+                    });
+            }
+            else //Fresh start
+            {
+                if (e.NewSettings == null)
+                {
+                    throw new ArgumentNullException(nameof(e.NewSettings));
+                }
+
+                _Computer = new Computer()
+                {
+                    IsCpuEnabled         = e.NewSettings.IsMonitorEnabled(HardwareMonitorType.CPU),
+                    IsControllerEnabled  = false,
+                    IsGpuEnabled         = e.NewSettings.IsMonitorEnabled(HardwareMonitorType.GPU),
+                    IsStorageEnabled     = e.NewSettings.IsMonitorEnabled(HardwareMonitorType.Storage),
+                    IsMotherboardEnabled = true,
+                    IsMemoryEnabled      = e.NewSettings.IsMonitorEnabled(HardwareMonitorType.RAM),
+                    IsNetworkEnabled     = e.NewSettings.IsMonitorEnabled(HardwareMonitorType.Network),
+                };
+
+                _Computer.Open();
+
+                _Computer.HardwareAdded   += OnHardwareAdded;
+                _Computer.HardwareRemoved += OnHardwareRemoved;
+
+                _Board = GetHardware(HardwareType.Motherboard).FirstOrDefault();
+
+                UpdateBoard();
+
+                var panels = e.NewSettings.HardwareMonitorConfigs
+                                .Where(hmc => hmc.Enabled)
+                                .OrderBy(hmc => hmc.Order)
+                                .Select(CreatePanel)
+                                .ToList();
+
+                HardwarePanels = new ObservableCollectionEx<HardwarePanel>(panels);
+
+                e.NewSettings.HardwareMonitorConfigs.ForEach(ApplyHardwareConfigChanges);
+            }
+        }
+
+        void ApplyHardwareConfigChanges(HardwareMonitorConfig cfg)
+        {
+            if (HardwarePanels == null || cfg?.HardwareOC == null)
+            {
+                return;
+            }
+
+            using (var guard = new LockGuard(_HardwarePanelsLock))
+            {
+                var panel = HardwarePanels.FirstOrDefault(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
+                if (panel == null)
+                {
+                    return;
+                }
+
+                if (panel.Hardware.Count == cfg.HardwareOC?.Count)
+                {
+                    //Update order of Hardware according to config
+                    for (int i = 0; i < cfg.HardwareOC.Count; ++i)
+                    {
+                        var config = cfg.HardwareOC[i];
+
+                        //Get current index of Hardware according to config
+                        var index = panel.Hardware.FindIndex(hm => hm.ID == config.ID);
+                        if (index >= 0 && i != index)
+                        {
+                            //Position in config has changed - move Hardware to new position
+                            panel.Hardware.Move(index, i);
+                        }
+                    }
+
+                    //Update names of Hardware, if changed
+                    foreach (var hw in cfg.HardwareOC)
+                    {
+                        var found = panel.Hardware.FirstOrDefault(hm => hm.ID == hw.ID);
+                        if (found != null && found.Name != hw.Name)
+                        {
+                            found.Name = hw.Name;
+                        }
+                    }
+
+                    //Update order of Hardware
+                    for (byte i = 0; i < panel.Hardware.Count; ++i)
+                    {
+                        panel.Hardware[i].Order = i;
+                    }
+                }
+
+                foreach (var monitor in panel.Hardware)
+                {
+                    var matching = cfg.HardwareOC?.FirstOrDefault(hc => hc.ID == monitor.ID);
+                    if (matching != null)
+                    {
+                        monitor.Enabled = matching.Enabled;
+                    }
+                }
+            }
+        }
+
+        void OnHardwareAdded(IHardware hardware)
+        {
+            if (hardware.HardwareType == HardwareType.Storage)
+            {
+                OnStoragesChanged();
+            }
+            else
+            {
+                Logger.Instance.Add(LogLevel.Warn, $"{nameof(OnHardwareAdded)}: unhandled {nameof(HardwareType)} '{hardware.HardwareType}'.", DateTime.Now);
+            }
+        }
+
+        void OnHardwareRemoved(IHardware hardware)
+        {
+            if (hardware.HardwareType == HardwareType.Storage)
+            {
+                OnStoragesChanged();
+            }
+            else
+            {
+                Logger.Instance.Add(LogLevel.Warn, $"{nameof(OnHardwareRemoved)}: unhandled {nameof(HardwareType)} '{hardware.HardwareType}'.", DateTime.Now);
+            }
+        }
+
+        void OnStoragesChanged()
+        {
+            var cfg = Global.Settings.HardwareMonitorConfigs.Find(hmc => hmc.HardwareMonitorType == HardwareMonitorType.Storage);
+
+            if (cfg != null && HardwarePanels != null)
+            {
+                using (var guard = new LockGuard(_HardwarePanelsLock))
+                {
+                    //Remove old panel and add new one with updated hardware list
+                    HardwarePanels.Remove(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
+                    HardwarePanels.TryInsert(cfg.Order, CreatePanel(cfg));
+                }
+            }
+        }
+
+        void UpdateMemorySize()
+        {
+#if DEBUG
+            var memory = Environment.WorkingSet;
+            
+            var memoryInMB = memory == 0 ? 0 : DataStorageSizeConverter.ByteToMegabyte((ulong)memory);
+
+            Global.ProcessInformation.TotalMemorySize = memoryInMB;
+#endif
+        }
+
+        #endregion
+    }
+}

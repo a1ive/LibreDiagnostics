@@ -1,0 +1,46 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models"
+					xmlns:ava="clr-namespace:BlackSharp.UI.Avalonia.Data;assembly=BlackSharp.UI.Avalonia">
+
+	<ControlTheme x:Key="MenuButton" TargetType="Button">
+		<Setter Property="HorizontalAlignment" Value="Right"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Width">
+			<Setter.Value>
+				<ava:ScaleFontBinding Factor="2" Path="GlobalFontSize" Source="{x:Static global:Global.FontManager}"/>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Height">
+			<Setter.Value>
+				<ava:ScaleFontBinding Factor="2" Path="GlobalFontSize" Source="{x:Static global:Global.FontManager}"/>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Margin" Value="10,0,0,0"/>
+		<Setter Property="Foreground" Value="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="Button">
+					<Border Background="{TemplateBinding Background}">
+						<Viewbox Stretch="Uniform">
+							<ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						</Viewbox>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Interaction.Behaviors">
+			<Setter.Value>
+				<BehaviorCollectionTemplate>
+					<BehaviorCollection>
+						<DataTriggerBehavior Binding="{Binding IsPointerOver, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" ComparisonCondition="Equal" Value="True">
+							<ChangePropertyAction PropertyName="Opacity" Value="0.75"/>
+						</DataTriggerBehavior>
+					</BehaviorCollection>
+				</BehaviorCollectionTemplate>
+			</Setter.Value>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>

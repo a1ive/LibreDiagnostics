@@ -1,0 +1,55 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models"
+					xmlns:metric="clr-namespace:LibreDiagnostics.Models.Hardware.Metrics;assembly=LibreDiagnostics.Models"
+					xmlns:behaviors="clr-namespace:BlackSharp.UI.Avalonia.Behaviors;assembly=BlackSharp.UI.Avalonia"
+					xmlns:enums="clr-namespace:LibreDiagnostics.Models.Enums;assembly=LibreDiagnostics.Models">
+
+	<ControlTheme x:Key="DataText" TargetType="TextBlock">
+		<Setter Property="Foreground" Value="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="TextWrapping" Value="WrapWithOverflow"/>
+		<Setter Property="FontSize" Value="{Binding GlobalFontSize, Source={x:Static global:Global.FontManager}, Mode=OneWay}"/>
+		<Setter Property="behaviors:AutoWrapWidthAttached.Enable" Value="True"/>
+	</ControlTheme>
+
+	<ControlTheme x:Key="HardwareText" TargetType="TextBlock" BasedOn="{StaticResource DataText}">
+		<Setter Property="Margin" Value="0,0,0,6"/>
+	</ControlTheme>
+
+	<ControlTheme x:Key="MetricLabel" TargetType="TextBlock" BasedOn="{StaticResource DataText}">
+		<Setter Property="DockPanel.Dock" Value="Left"/>
+		<Setter Property="Margin" Value="{Binding GlobalFontSize, Source={x:Static global:Global.FontManager}, Mode=OneWay, Converter={StaticResource FontToSpaceConverter}}"/>
+		<Setter Property="Foreground">
+			<Setter.Value>
+				<MultiBinding x:DataType="metric:MetricBase" Converter="{StaticResource AlertColorConverter}">
+					<Binding Path="IsAlerting"/>
+					<Binding Path="FontColor"      Source="{x:Static global:Global.Settings}" Converter="{StaticResource StringToColorConverter}"/>
+					<Binding Path="AlertFontColor" Source="{x:Static global:Global.Settings}" Converter="{StaticResource StringToColorConverter}"/>
+				</MultiBinding>
+			</Setter.Value>
+		</Setter>
+	</ControlTheme>
+
+	<ControlTheme x:Key="MetricValue" TargetType="TextBlock" BasedOn="{StaticResource MetricLabel}">
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="Interaction.Behaviors">
+			<Setter.Value>
+				<BehaviorCollectionTemplate>
+					<BehaviorCollection>
+						<DataTriggerBehavior Binding="{Binding TextAlignment, Source={x:Static global:Global.Settings}, Mode=OneWay}" ComparisonCondition="Equal" Value="{x:Static enums:TextAlignment.Left}">
+							<ChangePropertyAction PropertyName="DockPanel.Dock" Value="Left"/>
+							<ChangePropertyAction PropertyName="TextAlignment" Value="Left"/>
+						</DataTriggerBehavior>
+						<DataTriggerBehavior Binding="{Binding TextAlignment, Source={x:Static global:Global.Settings}, Mode=OneWay}" ComparisonCondition="Equal" Value="{x:Static enums:TextAlignment.Right}">
+							<ChangePropertyAction PropertyName="DockPanel.Dock" Value="Right"/>
+							<ChangePropertyAction PropertyName="TextAlignment" Value="Right"/>
+						</DataTriggerBehavior>
+					</BehaviorCollection>
+				</BehaviorCollectionTemplate>
+			</Setter.Value>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>

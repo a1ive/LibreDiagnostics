@@ -1,0 +1,381 @@
+<local:FlatWindow xmlns="https://github.com/avaloniaui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		          xmlns:local="using:LibreDiagnostics.UI.Windows"
+		          xmlns:lang="clr-namespace:LibreDiagnostics.Language.Resources;assembly=LibreDiagnostics.Language"
+                  xmlns:ctrl="using:BlackSharp.UI.Avalonia.Controls"
+				  xmlns:vm="clr-namespace:LibreDiagnostics.MVVM.ViewModels;assembly=LibreDiagnostics.MVVM"
+                  xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models"
+                  xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+				  xmlns:cfg="using:LibreDiagnostics.Models.Configuration"
+				  xmlns:dt="using:LibreDiagnostics.UI.Controls.Templates"
+				  xmlns:enums="clr-namespace:LibreDiagnostics.Models.Enums;assembly=LibreDiagnostics.Models"
+                  mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="650"
+                  x:Class="LibreDiagnostics.UI.Windows.SettingsWindow"
+                  x:DataType="vm:SettingsViewModel"
+                  Title="{x:Static lang:Resources.SettingsTitle}" WindowStartupLocation="CenterScreen"
+                  Theme="{StaticResource FlatWindowStyle}" Width="420"
+                  Icon="avares://LibreDiagnostics.UI/Assets/Icon.ico"
+                  TitleIcon="avares://LibreDiagnostics.UI/Assets/Icon.ico"
+                  ShowTitleBar="True" ShowTitle="True" ShowIcon="True"
+                  ShowClose="True" CanResize="False">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MockSettingsViewModel/>
+    </Design.DataContext>
+
+    <Window.Resources>
+		<ResourceDictionary>
+			<sys:Double x:Key="AppWidthFallback">170</sys:Double>
+			<sys:Int32 x:Key="FontSizeFallback">11</sys:Int32>
+			<sys:Int32 x:Key="HorizontalOffsetFallback">0</sys:Int32>
+			<sys:Int32 x:Key="VerticalOffsetFallback">0</sys:Int32>
+			<sys:Int32 x:Key="UpdateIntervalFallback">1000</sys:Int32>
+			<sys:Double x:Key="BackgroundOpacityFallback">1</sys:Double>
+
+            <sys:Int16 x:Key="FallbackZeroInt16">0</sys:Int16>
+            <sys:Int64 x:Key="FallbackZeroInt64">0</sys:Int64>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+	    <DockPanel LastChildFill="True">
+            <DockPanel.Styles>
+				<Style Selector="Label">
+					<Setter Property="VerticalAlignment" Value="Center"/>
+					<Setter Property="Foreground" Value="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"/>
+                </Style>
+				<!-- Limit TabItem header template to the main settings TabControl to avoid creating an issue with ColorPicker -->
+				<Style Selector="#SettingsTabControl > TabItem">
+					<Setter Property="HeaderTemplate">
+                        <DataTemplate>
+							<TextBlock Text="{Binding}" FontWeight="Bold"/>
+                        </DataTemplate>
+                    </Setter>
+                </Style>
+				<Style Selector="ctrl|TextBoxNumber">
+                    <Setter Property="Margin" Value="0,0,10,0"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="90"/>
+                    <Setter Property="Height" Value="32"/>
+                </Style>
+            </DockPanel.Styles>
+            <!-- Save, Close Buttons -->
+		    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="20"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Button Content="{x:Static lang:Resources.ButtonSave }" Command="{Binding SaveCommand }" Margin="10,0,0,0"/>
+                <Button Content="{x:Static lang:Resources.ButtonApply}" Command="{Binding ApplyCommand}" Margin="10,0,0,0"/>
+                <Button Content="{x:Static lang:Resources.ButtonClose}" Command="{Binding CloseCommand}" Margin="10,0,0,0"/>
+            </StackPanel>
+            <!-- Tabs -->
+            <TabControl x:Name="SettingsTabControl" Margin="15,15,15,0" Padding="15">
+                <!-- General Tab -->
+				<TabItem Header="{x:Static lang:Resources.SettingsGeneralTab}">
+                    <ctrl:GridEx ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+						<Label Grid.Column="0" Grid.Row="0" Content="{x:Static lang:Resources.SettingsDock}"/>
+                        <ComboBox Grid.Column="1" Grid.Row="0"
+                                  ItemsSource="{Binding DockingPositionList, Mode=OneWay}"
+                                  SelectedItem="{Binding DockingPositionSelected}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  SelectedValue="{Binding DockingPositionSelected.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsDockTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="1" Content="{x:Static lang:Resources.SettingsScreen}"/>
+                        <ComboBox Grid.Column="1" Grid.Row="1"
+                                  ItemsSource="{Binding ScreenList, Mode=OneWay}"
+                                  SelectedItem="{Binding ScreenSelected}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  SelectedValue="{Binding ScreenSelected.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsScreenTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="2" Content="{x:Static lang:Resources.SettingsLanguage}"/>
+                        <ComboBox Grid.Column="1" Grid.Row="2"
+                                  ItemsSource="{Binding LanguageList, Mode=OneWay}"
+                                  SelectedItem="{Binding LanguageSelected}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  SelectedValue="{Binding LanguageSelected.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsLanguageTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="3" Content="{x:Static lang:Resources.SettingsTextAlignment}"/>
+                        <ComboBox Grid.Column="1" Grid.Row="3"
+                                  ItemsSource="{Binding TextAlignmentList, Mode=OneWay}"
+                                  SelectedItem="{Binding TextAlignmentSelected}"
+                                  DisplayMemberBinding="{Binding Text}"
+                                  SelectedValueBinding="{Binding Value}"
+                                  SelectedValue="{Binding TextAlignmentSelected.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsTextAlignmentTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="4" Content="{x:Static lang:Resources.SettingsIsAppBar}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="4"
+                                  IsChecked="{Binding Settings.IsAppBar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsIsAppBarTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="5" Content="{x:Static lang:Resources.SettingsAlwaysOnTop}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="5"
+                                  IsChecked="{Binding Settings.AlwaysOnTop, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsAlwaysOnTopTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="6" Content="{x:Static lang:Resources.SettingsRunAtStartup}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="6"
+                                  IsChecked="{Binding Settings.StartWithSystem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsRunAtStartupTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="7" Content="{x:Static lang:Resources.SettingsAutoUpdate}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="7"
+                                  IsChecked="{Binding Settings.AutoUpdate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsAutoUpdateTooltip}"/>
+                    </ctrl:GridEx>
+                </TabItem>
+                <!-- Advanced Tab -->
+				<TabItem Header="{x:Static lang:Resources.SettingsAdvancedTab}">
+                    <ctrl:GridEx ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+						<Label Grid.Column="0" Grid.Row="0" Content="{x:Static lang:Resources.SettingsAppWidth}"/>
+                        <DockPanel Grid.Column="1" Grid.Row="0">
+                            <ctrl:TextBoxNumber NumberType="Double" AllowNegative="False"
+                                                Text="{Binding ElementName=AppWidthSlider, Path=Value, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource AppWidthFallback}}"/>
+							<Slider x:Name="AppWidthSlider" TickPlacement="BottomRight"
+                                    Value="{Binding Settings.AppWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Minimum="100" Maximum="300" TickFrequency="5" LargeChange="20" IsSnapToTickEnabled="True"
+                                    ToolTip.Tip="{x:Static lang:Resources.SettingsAppWidthTooltip}"/>
+                        </DockPanel>
+
+						<Label Grid.Column="0" Grid.Row="1" Content="{x:Static lang:Resources.SettingsFontSize}"/>
+                        <DockPanel Grid.Column="1" Grid.Row="1">
+                            <ctrl:TextBoxNumber NumberType="Double" AllowNegative="False"
+                                                Text="{Binding ElementName=FontSizeSlider, Path=Value, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource FontSizeFallback}}"/>
+							<Slider x:Name="FontSizeSlider" TickPlacement="BottomRight"
+                                    Value="{Binding Settings.FontSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Minimum="8" Maximum="18" TickFrequency="1" LargeChange="2" IsSnapToTickEnabled="True"
+                                    ToolTip.Tip="{x:Static lang:Resources.SettingsFontSizeTooltip}"/>
+                        </DockPanel>
+
+						<Label Grid.Column="0" Grid.Row="2" Content="{x:Static lang:Resources.SettingsHorizontalOffset}"/>
+                        <DockPanel Grid.Column="1" Grid.Row="2">
+                            <ctrl:TextBoxNumber NumberType="Int"
+                                                Text="{Binding ElementName=HorizontalOffsetSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+							<Slider x:Name="HorizontalOffsetSlider" TickPlacement="BottomRight"
+                                    Value="{Binding Settings.HorizontalOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource HorizontalOffsetFallback}}"
+                                    Minimum="-2000" Maximum="2000" TickFrequency="1" LargeChange="200" IsSnapToTickEnabled="True"
+                                    ToolTip.Tip="{x:Static lang:Resources.SettingsHorizontalOffsetTooltip}"/>
+                        </DockPanel>
+
+						<Label Grid.Column="0" Grid.Row="3" Content="{x:Static lang:Resources.SettingsVerticalOffset}"/>
+                        <DockPanel Grid.Column="1" Grid.Row="3">
+                            <ctrl:TextBoxNumber NumberType="Int"
+                                                Text="{Binding ElementName=VerticalOffsetSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+							<Slider x:Name="VerticalOffsetSlider" TickPlacement="BottomRight"
+                                    Value="{Binding Settings.VerticalOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource VerticalOffsetFallback}}"
+                                    Minimum="-2000" Maximum="2000" TickFrequency="1" LargeChange="200" IsSnapToTickEnabled="True"
+                                    ToolTip.Tip="{x:Static lang:Resources.SettingsVerticalOffsetTooltip}"/>
+                        </DockPanel>
+
+						<Label Grid.Column="0" Grid.Row="4" Content="{x:Static lang:Resources.SettingsUpdateInterval}"/>
+                        <DockPanel Grid.Column="1" Grid.Row="4">
+                            <ctrl:TextBoxNumber NumberType="Int" AllowNegative="False"
+                                                Text="{Binding ElementName=UpdateIntervalSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+							<Slider x:Name="UpdateIntervalSlider" TickPlacement="BottomRight"
+                                    Value="{Binding Settings.UpdateInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource UpdateIntervalFallback}}"
+                                    Minimum="100" Maximum="30000" TickFrequency="100" LargeChange="1000" IsSnapToTickEnabled="True"
+                                    ToolTip.Tip="{x:Static lang:Resources.SettingsUpdateIntervalTooltip}"/>
+                        </DockPanel>
+
+						<Label Grid.Column="0" Grid.Row="5" Content="{x:Static lang:Resources.SettingsShowTrayIcon}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="5"
+                                  IsChecked="{Binding Settings.ShowTrayIcon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsShowTrayIconTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="6" Content="{x:Static lang:Resources.SettingsIsInAltTab}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="6"
+                                  IsChecked="{Binding Settings.IsInAltTab, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsIsInAltTabTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="7" Content="{x:Static lang:Resources.SettingsClickThrough}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="7"
+                                  IsChecked="{Binding Settings.ClickThrough, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsClickThroughTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="8" Content="{x:Static lang:Resources.SettingsShowMenuBar}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="8"
+                                  IsChecked="{Binding Settings.ShowMenuBar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsShowMenuBarTooltip}"/>
+                    </ctrl:GridEx>
+                </TabItem>
+                <!-- Customize Tab -->
+				<TabItem Header="{x:Static lang:Resources.SettingsCustomizeTab}">
+                    <ctrl:GridEx ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+						<Label Grid.Column="0" Grid.Row="0" Content="{x:Static lang:Resources.SettingsAutoBackground}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="0"
+                                  IsChecked="{Binding Settings.AutoBackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsAutoBackgroundTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="1" Content="{x:Static lang:Resources.SettingsBackgroundColor}"/>
+                        <ColorPicker Grid.Column="1" Grid.Row="1"
+                                     IsHexInputVisible="True" HorizontalAlignment="Left"
+                                     Color="{Binding Settings.BackgroundColor, Converter={StaticResource StringToColorConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip.Tip="{x:Static lang:Resources.SettingsBackgroundColorTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="2" Content="{x:Static lang:Resources.SettingsBackgroundOpacity}"/>
+                        <DockPanel Grid.Column="1" Grid.Row="2">
+                            <ctrl:TextBoxNumber NumberType="Double" AllowNegative="False"
+                                                Text="{Binding ElementName=BackgroundOpacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"/>
+							<Slider x:Name="BackgroundOpacitySlider" TickPlacement="BottomRight"
+                                    Value="{Binding Settings.BackgroundOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource BackgroundOpacityFallback}}"
+                                    Minimum="0.01" Maximum="1.0" TickFrequency="0.01" LargeChange="0.1" IsSnapToTickEnabled="True"
+                                    ToolTip.Tip="{x:Static lang:Resources.SettingsBackgroundOpacityTooltip}"/>
+                        </DockPanel>
+
+						<Label Grid.Column="0" Grid.Row="3" Content="{x:Static lang:Resources.SettingsAutoFontColor}"/>
+                        <CheckBox Grid.Column="1" Grid.Row="3"
+                                  IsChecked="{Binding Settings.AutoFontColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip.Tip="{x:Static lang:Resources.SettingsAutoFontColorTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="4" Content="{x:Static lang:Resources.SettingsFontColor}"/>
+                        <ColorPicker Grid.Column="1" Grid.Row="4"
+                                     IsHexInputVisible="True" HorizontalAlignment="Left"
+                                     Color="{Binding Settings.FontColor, Converter={StaticResource StringToColorConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip.Tip="{x:Static lang:Resources.SettingsFontColorTooltip}"/>
+
+						<Label Grid.Column="0" Grid.Row="5" Content="{x:Static lang:Resources.SettingsAlertFontColor}"/>
+                        <ColorPicker Grid.Column="1" Grid.Row="5"
+                                     IsHexInputVisible="True" HorizontalAlignment="Left"
+                                     Color="{Binding Settings.AlertFontColor, Converter={StaticResource StringToColorConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     ToolTip.Tip="{x:Static lang:Resources.SettingsAlertFontColorTooltip}"/>
+
+                    </ctrl:GridEx>
+                </TabItem>
+                <!-- Monitors Tab -->
+				<TabItem Header="{x:Static lang:Resources.SettingsMonitorsTab}">
+                    <StackPanel>
+                        <StackPanel>
+                            <Label Content="{x:Static lang:Resources.SettingsMonitorsDragDropTitle1}"/>
+                            <Label Content="{x:Static lang:Resources.SettingsMonitorsDragDropTitle2}"/>
+                        </StackPanel>
+                        <DataGrid AutoGenerateColumns="False" SelectionMode="Single"
+                                  CanUserReorderColumns="False" CanUserResizeColumns="False"
+                                  CanUserSortColumns="False" GridLinesVisibility="None"
+                                  ItemsSource="{Binding Settings.HardwareMonitorConfigs}"
+                                  HeadersVisibility="All" Classes="DragAndDrop ItemsDragAndDrop">
+							<DataGrid.Columns>
+								<DataGridTemplateColumn Header="{x:Static lang:Resources.SettingsMonitorsEnabled}">
+									<DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate DataType="cfg:HardwareMonitorConfig">
+											<CheckBox IsChecked="{Binding Enabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      HorizontalAlignment="Center"
+                                                      ToolTip.Tip="{x:Static lang:Resources.SettingsMonitorEnabledTooltip}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+								<DataGridTemplateColumn Header="{x:Static lang:Resources.SettingsMonitorsMonitor}" Width="*">
+									<DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate DataType="cfg:HardwareMonitorConfig">
+											<Label Content="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                            <DataGrid.RowDetailsTemplate>
+								<DataTemplate x:DataType="cfg:HardwareMonitorConfig">
+									<Border Padding="15,15,15,5">
+										<StackPanel>
+											<DataGrid ItemsSource="{Binding HardwareOC}" CanUserReorderColumns="False"
+                                                      HeadersVisibility="All" Classes="DragAndDrop ItemsDragAndDrop">
+												<DataGrid.Columns>
+                                                    <DataGridTemplateColumn Header="{x:Static lang:Resources.SettingsHardwareEnabled}">
+                                                        <DataGridTemplateColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <CheckBox IsChecked="{Binding Enabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                          HorizontalAlignment="Center"
+                                                                          ToolTip.Tip="{x:Static lang:Resources.SettingsHardwareEnabledTooltip}"/>
+                                                            </DataTemplate>
+                                                        </DataGridTemplateColumn.CellTemplate>
+                                                    </DataGridTemplateColumn>
+                                                    <DataGridTemplateColumn Header="{x:Static lang:Resources.SettingsHardwareName}">
+                                                        <DataGridTemplateColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <TextBox Text="{Binding Name, Mode=TwoWay}"
+                                                                         ToolTip.Tip="{x:Static lang:Resources.SettingsHardwareNameTooltip}"/>
+                                                            </DataTemplate>
+                                                        </DataGridTemplateColumn.CellTemplate>
+                                                    </DataGridTemplateColumn>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+
+                                            <DockPanel LastChildFill="True" Margin="0,15,0,0">
+												<Label DockPanel.Dock="Left" Margin="0,0,10,0" Content="{x:Static lang:Resources.SettingsMetrics}"/>
+                                                <ComboBox ItemsSource="{Binding MetricConfig, Mode=OneWay}"
+                                                          ToolTip.Tip="{x:Static lang:Resources.SettingsMetricsTooltip}">
+                                                    <ComboBox.SelectionBoxItemTemplate>
+                                                        <DataTemplate>
+															<TextBlock x:CompileBindings="False"
+                                                                       Text="{Binding DataContext.MetricConfig, Converter={StaticResource MetricConfigToSelectionConverter}, RelativeSource={RelativeSource AncestorType=ComboBox, Mode=FindAncestor}}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.SelectionBoxItemTemplate>
+													<ComboBox.ItemTemplate>
+														<DataTemplate>
+															<Grid ColumnDefinitions="Auto,*">
+																<CheckBox Grid.Column="0" IsChecked="{Binding Enabled}"/>
+																<TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </DockPanel>
+
+                                            <ItemsControl ItemsSource="{Binding HardwareConfigOptions}">
+												<ItemsControl.ItemTemplate>
+                                                    <dt:HardwareConfigOptionsTemplateSelector>
+                                                        <DataTemplate x:DataType="cfg:HardwareConfigOptions" x:Key="{x:Static enums:HardwareConfigOptionValueKind.Boolean}">
+				                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                                                      ToolTip.Tip="{Binding Tooltip}"/>
+                                                        </DataTemplate>
+
+                                                        <DataTemplate x:DataType="cfg:HardwareConfigOptions" x:Key="{x:Static enums:HardwareConfigOptionValueKind.Int16}">
+                                                            <Grid Margin="0,0,0,5">
+																<Grid.ColumnDefinitions>
+																	<ColumnDefinition SharedSizeGroup="iHwCfgOptDtLabel"/>
+																	<ColumnDefinition SharedSizeGroup="iHwCfgOptDtText"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Label Grid.Column="0" Content="{Binding Name}" Margin="0,0,10,0"/>
+                                                                <ctrl:TextBoxNumber Grid.Column="1" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource FallbackZeroInt16}}"
+                                                                                    NumberType="Short" ToolTip.Tip="{Binding Tooltip}"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+
+                                                        <DataTemplate x:DataType="cfg:HardwareConfigOptions" x:Key="{x:Static enums:HardwareConfigOptionValueKind.Int64}">
+                                                            <Grid Margin="0,0,0,5">
+																<Grid.ColumnDefinitions>
+																	<ColumnDefinition SharedSizeGroup="iHwCfgOptDtLabel"/>
+																	<ColumnDefinition SharedSizeGroup="iHwCfgOptDtText"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Label Grid.Column="0" Content="{Binding Name}" Margin="0,0,10,0"/>
+                                                                <ctrl:TextBoxNumber Grid.Column="1" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, FallbackValue={StaticResource FallbackZeroInt64}}"
+                                                                                    NumberType="Long" ToolTip.Tip="{Binding Tooltip}"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </dt:HardwareConfigOptionsTemplateSelector>
+                                                </ItemsControl.ItemTemplate>
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Grid.IsSharedSizeScope="True"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGrid.RowDetailsTemplate>
+                        </DataGrid>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Grid>
+</local:FlatWindow>

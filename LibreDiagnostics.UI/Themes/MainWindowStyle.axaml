@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:wnd="using:LibreDiagnostics.UI.Windows"
+		xmlns:lang="clr-namespace:LibreDiagnostics.Language.Resources;assembly=LibreDiagnostics.Language"
+		xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceInclude Source="/Converter/Converter.axaml"/>
+		<ResourceInclude Source="/Themes/FlatWindowStyle.axaml"/>
+	</ResourceDictionary.MergedDictionaries>
+
+	<ControlTheme x:Key="SBWindowStyle" TargetType="wnd:FlatWindow" BasedOn="{StaticResource FlatWindowStyle}">
+		<Setter Property="Title" Value="{x:Static lang:Resources.AppName}"/>
+		<Setter Property="IsHitTestVisible" Value="False"/>
+		<Setter Property="ShowInTaskbar" Value="False"/>
+		<Setter Property="CanResize" Value="False"/>
+		<Setter Property="ShowActivated" Value="False"/>
+		<Setter Property="ShowTitleBar" Value="False"/>
+		<Setter Property="ShowIcon" Value="False"/>
+		<Setter Property="ShowTitle" Value="False"/>
+		<Setter Property="ShowMinimize" Value="False"/>
+		<Setter Property="ShowMaximize" Value="False"/>
+		<Setter Property="ShowClose" Value="False"/>
+		<Setter Property="BorderBrush" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+
+		<Setter Property="Background">
+			<Setter.Value>
+				<SolidColorBrush Opacity="{Binding BackgroundOpacity, Source={x:Static global:Global.Settings}, Mode=OneWay}"
+								 Color="{Binding BackgroundColor, Source={x:Static global:Global.Settings}, Converter={StaticResource StringToColorConverter}, Mode=OneWay}"/>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="wnd:FlatWindow">
+					<ContentPresenter Content="{TemplateBinding Content}" Background="{TemplateBinding Background}"/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</ControlTheme>
+</ResourceDictionary>

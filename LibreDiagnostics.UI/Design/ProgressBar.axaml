@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models"
+					xmlns:enums="clr-namespace:LibreDiagnostics.Models.Enums;assembly=LibreDiagnostics.Models">
+
+	<ControlTheme x:Key="DriveProgress" TargetType="ProgressBar">
+		<Setter Property="Minimum" Value="0"/>
+		<Setter Property="Maximum" Value="100"/>
+		<Setter Property="Margin" Value="0,4"/>
+		<Setter Property="Width" Value="{Binding BarWidthWide, Source={x:Static global:Global.FontManager}, Mode=OneWay}"/>
+		<Setter Property="Height" Value="{Binding BarHeight, Source={x:Static global:Global.FontManager}, Mode=OneWay}"/>
+		<Setter Property="HorizontalAlignment" Value="Left"/>
+		<Setter Property="Foreground" Value="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ProgressBar">
+					<Border Name="PART_Track" CornerRadius="2"
+							Background="{TemplateBinding Background}"
+							BorderBrush="{TemplateBinding Foreground}"
+							BorderThickness="0.66">
+						<Interaction.Behaviors>
+							<DataTriggerBehavior Binding="{Binding TextAlignment, Source={x:Static global:Global.Settings}, Mode=OneWay}" ComparisonCondition="Equal" Value="{x:Static enums:TextAlignment.Right}">
+								<ChangePropertyAction PropertyName="HorizontalAlignment" Value="Stretch"/>
+							</DataTriggerBehavior>
+						</Interaction.Behaviors>
+						<Border Name="PART_Indicator" CornerRadius="2,0,0,2"
+								Background="{TemplateBinding Foreground}"
+								BorderBrush="{TemplateBinding Background}"
+								BorderThickness="1" HorizontalAlignment="Left"/>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>

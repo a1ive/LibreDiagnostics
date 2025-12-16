@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+	<LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<Copyright>Florian K.</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlackSharp.Core" Version="1.0.6" />
+    <PackageReference Include="BlackSharp.MVVM" Version="1.0.6" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LibreDiagnostics.Models\LibreDiagnostics.Models.csproj" />
+    <ProjectReference Include="..\LibreDiagnostics.Tasks\LibreDiagnostics.Tasks.csproj" />
+  </ItemGroup>
+
+</Project>

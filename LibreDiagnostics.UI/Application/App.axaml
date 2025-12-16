@@ -1,0 +1,29 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="LibreDiagnostics.UI.App"
+             xmlns:local="using:LibreDiagnostics"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+		        <ResourceInclude Source="avares://BlackSharp.UI.Avalonia/Themes/Themes.axaml"/>
+				<ResourceInclude Source="avares://LibreDiagnostics.UI/Themes/MainWindowStyle.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+		<StyleInclude Source="avares://BlackSharp.UI.Avalonia/Styles/Styles.axaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    </Application.Styles>
+
+    <TrayIcon.Icons>
+		<TrayIcons>
+			<TrayIcon Icon="avares://LibreDiagnostics.UI/Assets/Icon.ico"/>
+        </TrayIcons>
+    </TrayIcon.Icons>
+</Application>

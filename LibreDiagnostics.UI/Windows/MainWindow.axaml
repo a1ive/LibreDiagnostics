@@ -1,0 +1,213 @@
+<local:FlatWindow xmlns="https://github.com/avaloniaui"
+				  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				  xmlns:vm="clr-namespace:LibreDiagnostics.MVVM.ViewModels;assembly=LibreDiagnostics.MVVM"
+				  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+				  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				  xmlns:local="using:LibreDiagnostics.UI.Windows"
+				  xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models"
+				  xmlns:hwMon="using:LibreDiagnostics.Models.Hardware.HardwareMonitor"
+				  xmlns:interfaces="using:LibreDiagnostics.Models.Interfaces"
+				  xmlns:behaviors="clr-namespace:BlackSharp.UI.Avalonia.Behaviors;assembly=BlackSharp.UI.Avalonia"
+				  xmlns:enums="clr-namespace:LibreDiagnostics.Models.Enums;assembly=LibreDiagnostics.Models"
+				  xmlns:ava="clr-namespace:BlackSharp.UI.Avalonia.Data;assembly=BlackSharp.UI.Avalonia"
+				  xmlns:attached="clr-namespace:BlackSharp.UI.Avalonia.Attached;assembly=BlackSharp.UI.Avalonia"
+				  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Margin="-20"
+				  x:Class="LibreDiagnostics.UI.Windows.MainWindow"
+				  x:DataType="vm:MainWindowViewModel"
+				  Icon="avares://LibreDiagnostics.UI/Assets/Icon.ico"
+				  Theme="{StaticResource SBWindowStyle}">
+
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="avares://LibreDiagnostics.UI/Design/Design.axaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MockMainWindowViewModel/>
+    </Design.DataContext>
+
+	<Grid>
+		<Interaction.Behaviors>
+			<DataTriggerBehavior Binding="{Binding DockingPosition, Source={x:Static global:Global.Settings}, Mode=OneWay}" ComparisonCondition="Equal" Value="{x:Static enums:DockingPosition.Left}">
+				<ChangePropertyAction PropertyName="Margin" Value="-10"/>
+			</DataTriggerBehavior>
+			<DataTriggerBehavior Binding="{Binding DockingPosition, Source={x:Static global:Global.Settings}, Mode=OneWay}" ComparisonCondition="Equal" Value="{x:Static enums:DockingPosition.Right}">
+				<ChangePropertyAction PropertyName="Margin" Value="-10"/>
+			</DataTriggerBehavior>
+		</Interaction.Behaviors>
+
+		<DockPanel Theme="{StaticResource MainPanel}">
+			<StackPanel IsVisible="{Binding ShowMenuBar, Source={x:Static global:Global.Settings}, Mode=OneWay}"
+						Margin="10,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+						Orientation="Horizontal" DockPanel.Dock="Top">
+				<!-- Memory size in MB (while debugging) -->
+				<TextBlock Text="{Binding TotalMemorySize, Mode=OneWay, Source={x:Static global:Global.ProcessInformation}, StringFormat='{}Memory: {0:F2} MB'}"
+						   HorizontalAlignment="Left" VerticalAlignment="Center"
+						   IsVisible="{Binding TotalMemorySize, Mode=OneWay, Source={x:Static global:Global.ProcessInformation}, Converter={x:Static ObjectConverters.IsNotNull}}">
+					<TextBlock.FontSize>
+						<ava:ScaleFontBinding Factor="0.75" Path="GlobalFontSize" Source="{x:Static global:Global.FontManager}"/>
+					</TextBlock.FontSize>
+				</TextBlock>
+				<Button Command="{Binding ShowSettingsCommand}" Theme="{StaticResource MenuButton}">
+					<Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" Data="M 38,23.5C 38.8643,23.5 39.7109,23.5756 40.5337,23.7206L 42.6275,18.5381L 48.1901,20.787L 46.0964,25.9692C 47.6473,27.0149 48.9851,28.3527 50.0308,29.9036L 55.213,27.8099L 57.4619,33.3725L 52.2794,35.4664C 52.4244,36.2891 52.5,37.1357 52.5,38C 52.5,38.8643 52.4244,39.7109 52.2794,40.5337L 57.4619,42.6275L 55.213,48.1901L 50.0308,46.0964C 49.0795,47.5073 47.8865,48.7418 46.5112,49.7405L 48.7844,54.8462L 43.3041,57.2891L 41.0307,52.1828C 40.0533,52.3906 39.0394,52.5 38,52.5C 37.1357,52.5 36.2891,52.4244 35.4664,52.2794L 33.3725,57.462L 27.8099,55.213L 29.9036,50.0309C 28.3527,48.9851 27.0149,47.6473 25.9691,46.0964L 20.787,48.1901L 18.538,42.6275L 23.7206,40.5336C 23.5756,39.7109 23.5,38.8643 23.5,38C 23.5,37.1357 23.5756,36.2891 23.7206,35.4664L 18.538,33.3725L 20.787,27.8099L 25.9691,29.9036C 26.9205,28.4927 28.1135,27.2582 29.4889,26.2594L 27.2157,21.1537L 32.6959,18.7109L 34.9694,23.8172C 35.9468,23.6094 36.9606,23.5 38,23.5 Z M 38,28C 32.4771,28 28,32.4772 28,38C 28,43.5229 32.4771,48 38,48C 43.5228,48 48,43.5229 48,38C 48,32.4772 43.5228,28 38,28 Z"/>
+				</Button>
+				<Button Command="{Binding CloseCommand}" Theme="{StaticResource MenuButton}">
+					<Path Fill="{Binding Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}" Data="M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z"/>
+				</Button>
+			</StackPanel>
+
+			<ScrollViewer DockPanel.Dock="Top" Margin="5,15"
+						  VerticalScrollBarVisibility="Hidden">
+				<Grid Margin="15,0" VerticalAlignment="Top">
+					<!-- All Hardware -->
+					<ItemsControl DataContext="{Binding HardwareManager, Mode=OneWay}"
+								  ItemsSource="{Binding HardwarePanels, Mode=OneWay}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Grid RowDefinitions="Auto,Auto">
+									<!-- Group title -->
+									<StackPanel Grid.Row="0" Orientation="Horizontal">
+										<Image Width="{Binding IconSize, Source={x:Static global:Global.FontManager}, Mode=OneWay}"
+											   Height="{Binding IconSize, Source={x:Static global:Global.FontManager}, Mode=OneWay}"
+											   Margin="0,0,10,0" Stretch="Uniform" VerticalAlignment="Center">
+											<Image.Source>
+												<DrawingImage>
+													<GeometryDrawing Geometry="{Binding IconData, Mode=OneWay}"
+																	 Brush="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"/>
+												</DrawingImage>
+											</Image.Source>
+										</Image>
+										<Label Content="{Binding Title}"
+												Padding="0" Margin="0" VerticalAlignment="Center"
+												Foreground="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"
+												FontSize="{Binding TitleFontSize, Source={x:Static global:Global.FontManager}, Mode=OneWay}"/>
+									</StackPanel>
+
+									<!-- Hardware item -->
+									<ItemsControl Grid.Row="1" ItemsSource="{Binding Hardware, Mode=OneWay}"
+												  attached:ItemsControlAttached.LastChildMargin="0,0,0,10">
+										<!--<ItemsControl.Styles>
+											<Style Selector="ItemsControl:nth-last-child(1)">
+												<Setter Property="Margin" Value="0,0,0,10"/>
+											</Style>
+										</ItemsControl.Styles>-->
+										<ItemsControl.DataTemplates>
+											<!-- Special template for drives -->
+											<DataTemplate DataType="hwMon:HardwareMonitorDrive">
+												<Grid Margin="0,10,0,5" RowDefinitions="Auto,Auto" IsVisible="{Binding Enabled}">
+													<ContentControl Grid.Row="0" IsVisible="{Binding ShowName}">
+														<ContentControl.Content>
+															<Button Focusable="False" Background="{x:Null}"
+																	BorderThickness="0" BorderBrush="{x:Null}"
+																	Margin="0" Padding="0">
+																<Interaction.Behaviors>
+																	<RoutedEventTriggerBehavior RoutedEvent="{x:Static Button.ClickEvent}">
+																		<InvokeCommandAction Command="{Binding RequestHardwareDetails}"/>
+																	</RoutedEventTriggerBehavior>
+																</Interaction.Behaviors>
+
+																<Grid>
+																	<TextBlock Text="{Binding Name, Mode=OneWay}"
+																			   Theme="{StaticResource HardwareText}"
+																			   IsVisible="{Binding DriveLayout, Mode=OneWay, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static enums:DriveLayout.NoLoadBar}}"/>
+																	<StackPanel Orientation="Vertical"
+																				IsVisible="{Binding DriveLayout, Mode=OneWay, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static enums:DriveLayout.LoadBarStacked}}">
+																		<TextBlock Text="{Binding Name, Mode=OneWay}"
+																				   Theme="{StaticResource DataText}"/>
+																		<ProgressBar DataContext="{Binding LoadMetric}"
+																					 Value="{Binding Value, Mode=OneWay}"
+																					 Theme="{StaticResource DriveProgress}"/>
+																	</StackPanel>
+																	<StackPanel Orientation="Horizontal"
+																				IsVisible="{Binding DriveLayout, Mode=OneWay, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static enums:DriveLayout.LoadBarInline}}">
+																		<TextBlock Text="{Binding Name, Mode=OneWay}"
+																				   Width="{Binding GlobalFontSize, Mode=OneWay, Source={x:Static global:Global.FontManager}}"
+																				   Theme="{StaticResource DataText}"/>
+																		<ProgressBar DataContext="{Binding LoadMetric}"
+																					 Margin="8,2,0,0"
+																					 Width="{Binding BarWidth, Mode=OneWay, Source={x:Static global:Global.FontManager}}"
+																					 Value="{Binding Value, Mode=OneWay}"
+																					 Theme="{StaticResource DriveProgress}"/>
+																	</StackPanel>
+																</Grid>
+															</Button>
+														</ContentControl.Content>
+													</ContentControl>
+
+													<!-- Metrics of item -->
+													<ItemsControl Grid.Row="1" ItemsSource="{Binding HardwareMetrics, Mode=OneWay}">
+														<ItemsControl.ItemTemplate>
+															<DataTemplate DataType="interfaces:IHardwareMetric">
+																<DockPanel Margin="0,0,0,-0.5" LastChildFill="False" IsVisible="{Binding Enabled}">
+																	<TextBlock Text="{Binding Label, Mode=OneWay, StringFormat='{}{0}: '}"
+																			   Theme="{StaticResource MetricLabel}"/>
+																	<TextBlock Text="{Binding Text, Mode=OneWay}"
+																			   Theme="{StaticResource MetricValue}"/>
+																</DockPanel>
+															</DataTemplate>
+														</ItemsControl.ItemTemplate>
+														<ItemsControl.ItemsPanel>
+															<ItemsPanelTemplate>
+																<StackPanel Orientation="Vertical"/>
+															</ItemsPanelTemplate>
+														</ItemsControl.ItemsPanel>
+													</ItemsControl>
+												</Grid>
+											</DataTemplate>
+
+											<DataTemplate DataType="hwMon:HardwareMonitorBase">
+												<Grid Margin="0,10,0,5" RowDefinitions="Auto,Auto" IsVisible="{Binding Enabled}">
+													<ContentControl Grid.Row="0" IsVisible="{Binding ShowName}">
+														<ContentControl.Content>
+															<TextBlock Text="{Binding Name, Mode=OneWay}"
+																	   Theme="{StaticResource HardwareText}"/>
+														</ContentControl.Content>
+													</ContentControl>
+
+													<!-- Metrics of item -->
+													<ItemsControl Grid.Row="1" ItemsSource="{Binding HardwareMetrics, Mode=OneWay}">
+														<ItemsControl.ItemTemplate>
+															<DataTemplate DataType="interfaces:IHardwareMetric">
+																<DockPanel Margin="0,0,0,-0.5" LastChildFill="False" IsVisible="{Binding Enabled}">
+																	<TextBlock Text="{Binding Label, Mode=OneWay, StringFormat='{}{0}: '}"
+																			   Theme="{StaticResource MetricLabel}"/>
+																	<TextBlock Text="{Binding Text, Mode=OneWay}"
+																			   Theme="{StaticResource MetricValue}"/>
+																</DockPanel>
+															</DataTemplate>
+														</ItemsControl.ItemTemplate>
+														<ItemsControl.ItemsPanel>
+															<ItemsPanelTemplate>
+																<StackPanel Orientation="Vertical"/>
+															</ItemsPanelTemplate>
+														</ItemsControl.ItemsPanel>
+													</ItemsControl>
+												</Grid>
+											</DataTemplate>
+										</ItemsControl.DataTemplates>
+										<ItemsControl.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Vertical"/>
+											</ItemsPanelTemplate>
+										</ItemsControl.ItemsPanel>
+									</ItemsControl>
+								</Grid>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Orientation="Vertical"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+					</ItemsControl>
+				</Grid>
+			</ScrollViewer>
+		</DockPanel>
+	</Grid>
+
+</local:FlatWindow>

@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models"
+					xmlns:vms="clr-namespace:LibreDiagnostics.MVVM.ViewModels;assembly=LibreDiagnostics.MVVM">
+
+	<ControlTheme x:Key="MainPanel" TargetType="DockPanel">
+		<Setter Property="LastChildFill" Value="True"/>
+		<Setter Property="IsVisible" Value="False"/>
+		<Setter Property="Interaction.Behaviors">
+			<Setter.Value>
+				<BehaviorCollectionTemplate>
+					<BehaviorCollection>
+						<DataTriggerBehavior x:DataType="vms:MainWindowViewModel" Binding="{Binding IsReady}" ComparisonCondition="Equal" Value="True">
+							<ChangePropertyAction PropertyName="IsVisible" Value="True"/>
+						</DataTriggerBehavior>
+					</BehaviorCollection>
+				</BehaviorCollectionTemplate>
+			</Setter.Value>
+		</Setter>
+	</ControlTheme>
+
+</ResourceDictionary>
