@@ -3,7 +3,7 @@
 </p>
 <h1 align="center">LibreDiagnostics</h1>
 
-[![GitHub license](https://img.shields.io/github/license/blacktempel/librediagnostics?label=License)](https://github.com/blacktempel/librediagnostics/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/blacktempel/LibreDiagnostics?label=License)](https://github.com/blacktempel/librediagnostics/blob/master/LICENSE)
 [![Build master](https://github.com/Blacktempel/LibreDiagnostics/actions/workflows/master.yml/badge.svg)](https://github.com/Blacktempel/LibreDiagnostics/actions/workflows/master.yml)
 ![GitHub all releases](https://img.shields.io/github/downloads/Blacktempel/LibreDiagnostics/total?label=Downloads)
 ![GitHub release](https://img.shields.io/github/v/release/Blacktempel/LibreDiagnostics?label=Version)
