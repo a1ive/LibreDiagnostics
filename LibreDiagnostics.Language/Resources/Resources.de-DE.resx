@@ -669,4 +669,10 @@
   <data name="NoSensorValue" xml:space="preserve">
     <value>Kein Wert</value>
   </data>
+  <data name="SettingsFontFamily" xml:space="preserve">
+    <value>Schriftart</value>
+  </data>
+  <data name="SettingsFontFamilyTooltip" xml:space="preserve">
+    <value>Schriftart von Texten.</value>
+  </data>
 </root>

@@ -81,6 +81,12 @@ All of our code is cross-platform and also builds on Linux.<br/>
 So far only Windows has been tested, so Linux support is experimental.<br/>
 Not all settings and features may be available on other operating systems.
 
+## Supported languages
+- English
+- German / Deutsch
+
+Feel free to contribute translations for other languages !
+
 ## Project overview
 | Project | .NET Version[s] |
 | --- | --- |

@@ -82,10 +82,10 @@
 												</DrawingImage>
 											</Image.Source>
 										</Image>
-										<Label Content="{Binding Title}"
-												Padding="0" Margin="0" VerticalAlignment="Center"
-												Foreground="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"
-												FontSize="{Binding TitleFontSize, Source={x:Static global:Global.FontManager}, Mode=OneWay}"/>
+										<TextBlock Text="{Binding Title}"
+												   Padding="0" Margin="0" VerticalAlignment="Center"
+												   Foreground="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"
+												   FontSize="{Binding TitleFontSize, Source={x:Static global:Global.FontManager}, Mode=OneWay}"/>
 									</StackPanel>
 
 									<!-- Hardware item -->

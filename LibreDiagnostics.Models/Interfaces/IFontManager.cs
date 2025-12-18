@@ -19,6 +19,11 @@ namespace LibreDiagnostics.Models.Interfaces
         /// </summary>
         double GlobalFontSize { get; set; }
 
+        /// <summary>
+        /// Defines global font family for the application.
+        /// </summary>
+        string GlobalFontFamily { get; set; }
+
         double TitleFontSize { get; }
 
         double SmallFontSize { get; }
@@ -30,5 +35,7 @@ namespace LibreDiagnostics.Models.Interfaces
         double BarWidth { get; }
 
         double BarWidthWide { get; }
+
+        List<string> GetSystemFontFamilies();
     }
 }

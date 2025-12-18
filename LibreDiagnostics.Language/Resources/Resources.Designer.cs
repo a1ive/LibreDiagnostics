@@ -1087,6 +1087,24 @@ namespace LibreDiagnostics.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Font family.
+        /// </summary>
+        public static string SettingsFontFamily {
+            get {
+                return ResourceManager.GetString("SettingsFontFamily", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Font family of texts..
+        /// </summary>
+        public static string SettingsFontFamilyTooltip {
+            get {
+                return ResourceManager.GetString("SettingsFontFamilyTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Font size.
         /// </summary>
         public static string SettingsFontSize {

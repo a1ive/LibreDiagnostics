@@ -14,7 +14,7 @@ using System.Globalization;
 
 namespace LibreDiagnostics.UI.Converter
 {
-    public class MetricConfigToSelectionConverter : IValueConverter
+    internal class MetricConfigToSelectionConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

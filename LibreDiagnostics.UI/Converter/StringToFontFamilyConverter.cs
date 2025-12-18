@@ -1,4 +1,4 @@
-/*
+﻿/*
 * This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -8,26 +8,31 @@
 */
 
 using Avalonia.Data.Converters;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
+using Avalonia.Media;
 using System.Globalization;
 
 namespace LibreDiagnostics.UI.Converter
 {
-    internal class StringToImageConverter : IValueConverter
+    internal class StringToFontFamilyConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var str = value as string;
+            if (value is string fontFamily && !string.IsNullOrWhiteSpace(fontFamily))
+            {
+                return FontManager.Current.SystemFonts.FirstOrDefault(ff => ff.Name == fontFamily, FontManager.Current.DefaultFontFamily.Name);
+            }
 
-            var uri = new Uri(str, UriKind.RelativeOrAbsolute);
-            using var stream = AssetLoader.Open(uri);
-            return new Bitmap(stream);
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            if (value is FontFamily ff)
+            {
+                return ff.Name;
+            }
+
+            return null;
         }
     }
 }

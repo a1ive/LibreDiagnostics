@@ -111,6 +111,15 @@ namespace LibreDiagnostics.MVVM.ViewModels
             set { SetField(ref _LanguageSelected, value); Settings.Language = _LanguageSelected.Value; }
         }
 
+        public List<string> FontFamilyList { get; set; }
+
+        string _FontFamilySelected;
+        public string FontFamilySelected
+        {
+            get { return _FontFamilySelected; }
+            set { SetField(ref _FontFamilySelected, value); Settings.FontFamily = _FontFamilySelected; }
+        }
+
         #endregion
 
         Settings _Settings;
@@ -253,6 +262,9 @@ namespace LibreDiagnostics.MVVM.ViewModels
 
             LanguageList = Culture.GetAll();
             LanguageSelected = LanguageList.FirstOrDefault(ci => ci.Value == Settings.Language);
+
+            FontFamilyList = Global.FontManager.GetSystemFontFamilies();
+            FontFamilySelected = Settings.FontFamily ?? Global.FontManager.GlobalFontFamily;
         }
 
         #endregion

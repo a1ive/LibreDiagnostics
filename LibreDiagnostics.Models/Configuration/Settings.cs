@@ -123,6 +123,14 @@ namespace LibreDiagnostics.Models.Configuration
             set { SetField(ref _FontSize, value); }
         }
 
+        string _FontFamily;
+        [JsonProperty]
+        public string FontFamily
+        {
+            get { return _FontFamily; }
+            set { SetField(ref _FontFamily, value); }
+        }
+
         int _HorizontalOffset = 0;
         [JsonProperty]
         public int HorizontalOffset

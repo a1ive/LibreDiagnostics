@@ -107,7 +107,8 @@ namespace LibreDiagnostics.Models.Globals
             Culture.SetCurrent(new System.Globalization.CultureInfo(e.NewSettings.Language));
 
             //FontManager may have not been initialized yet
-            FontManager?.GlobalFontSize = e.NewSettings.FontSize;
+            FontManager?.GlobalFontSize   = e.NewSettings.FontSize  ;
+            FontManager?.GlobalFontFamily = e.NewSettings.FontFamily;
         }
 
         #endregion

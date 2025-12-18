@@ -13,7 +13,7 @@ using System.Globalization;
 
 namespace LibreDiagnostics.UI.Converter
 {
-    public class FontToSpaceConverter : IValueConverter
+    internal class FontToSpaceConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
