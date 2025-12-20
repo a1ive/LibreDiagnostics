@@ -1708,11 +1708,83 @@ namespace LibreDiagnostics.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Power on count.
+        /// </summary>
+        public static string StoragePowerOnCount {
+            get {
+                return ResourceManager.GetString("StoragePowerOnCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Power on count of storage device..
+        /// </summary>
+        public static string StoragePowerOnCountTooltip {
+            get {
+                return ResourceManager.GetString("StoragePowerOnCountTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Power on hours.
+        /// </summary>
+        public static string StoragePowerOnHours {
+            get {
+                return ResourceManager.GetString("StoragePowerOnHours", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Power on hours of storage device..
+        /// </summary>
+        public static string StoragePowerOnHoursTooltip {
+            get {
+                return ResourceManager.GetString("StoragePowerOnHoursTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Storage details.
         /// </summary>
         public static string StorageTitle {
             get {
                 return ResourceManager.GetString("StorageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total reads in GB.
+        /// </summary>
+        public static string StorageTotalReads {
+            get {
+                return ResourceManager.GetString("StorageTotalReads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total reads of storage device in gigabyte..
+        /// </summary>
+        public static string StorageTotalReadsTooltip {
+            get {
+                return ResourceManager.GetString("StorageTotalReadsTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total writes in GB.
+        /// </summary>
+        public static string StorageTotalWrites {
+            get {
+                return ResourceManager.GetString("StorageTotalWrites", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total writes of storage device in gigabyte..
+        /// </summary>
+        public static string StorageTotalWritesTooltip {
+            get {
+                return ResourceManager.GetString("StorageTotalWritesTooltip", resourceCulture);
             }
         }
         

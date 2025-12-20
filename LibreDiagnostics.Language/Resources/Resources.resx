@@ -675,4 +675,28 @@
   <data name="SettingsFontFamilyTooltip" xml:space="preserve">
     <value>Font family of texts.</value>
   </data>
+  <data name="StorageTotalReads" xml:space="preserve">
+    <value>Total reads in GB</value>
+  </data>
+  <data name="StorageTotalReadsTooltip" xml:space="preserve">
+    <value>Total reads of storage device in gigabyte.</value>
+  </data>
+  <data name="StorageTotalWrites" xml:space="preserve">
+    <value>Total writes in GB</value>
+  </data>
+  <data name="StorageTotalWritesTooltip" xml:space="preserve">
+    <value>Total writes of storage device in gigabyte.</value>
+  </data>
+  <data name="StoragePowerOnCount" xml:space="preserve">
+    <value>Power on count</value>
+  </data>
+  <data name="StoragePowerOnCountTooltip" xml:space="preserve">
+    <value>Power on count of storage device.</value>
+  </data>
+  <data name="StoragePowerOnHours" xml:space="preserve">
+    <value>Power on hours</value>
+  </data>
+  <data name="StoragePowerOnHoursTooltip" xml:space="preserve">
+    <value>Power on hours of storage device.</value>
+  </data>
 </root>

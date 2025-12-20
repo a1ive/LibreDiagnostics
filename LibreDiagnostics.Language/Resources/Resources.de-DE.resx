@@ -675,4 +675,28 @@
   <data name="SettingsFontFamilyTooltip" xml:space="preserve">
     <value>Schriftart von Texten.</value>
   </data>
+  <data name="StorageTotalReads" xml:space="preserve">
+    <value>Gesamte Lesevorgänge in GB</value>
+  </data>
+  <data name="StorageTotalReadsTooltip" xml:space="preserve">
+    <value>Gesamte Lesevorgänge der Festplatte in Gigabyte.</value>
+  </data>
+  <data name="StorageTotalWrites" xml:space="preserve">
+    <value>Gesamte Schreibvorgänge in GB</value>
+  </data>
+  <data name="StorageTotalWritesTooltip" xml:space="preserve">
+    <value>Gesamte Schreibvorgänge der Festplatte in Gigabyte.</value>
+  </data>
+  <data name="StoragePowerOnCount" xml:space="preserve">
+    <value>Einschalt-Zähler</value>
+  </data>
+  <data name="StoragePowerOnCountTooltip" xml:space="preserve">
+    <value>Gibt an wie oft die Festplatte eingeschalten wurde.</value>
+  </data>
+  <data name="StoragePowerOnHours" xml:space="preserve">
+    <value>Betriebsstunden</value>
+  </data>
+  <data name="StoragePowerOnHoursTooltip" xml:space="preserve">
+    <value>Gibt an wie viele Stunden die Festplatte gelaufen ist.</value>
+  </data>
 </root>
