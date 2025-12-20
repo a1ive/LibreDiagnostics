@@ -164,8 +164,17 @@
 												<Grid Margin="0,10,0,5" RowDefinitions="Auto,Auto" IsVisible="{Binding Enabled}">
 													<ContentControl Grid.Row="0" IsVisible="{Binding ShowName}">
 														<ContentControl.Content>
-															<TextBlock Text="{Binding Name, Mode=OneWay}"
-																	   Theme="{StaticResource HardwareText}"/>
+															<Button Focusable="False" Background="{x:Null}"
+																	BorderThickness="0" BorderBrush="{x:Null}"
+																	Margin="0" Padding="0">
+																<Interaction.Behaviors>
+																	<RoutedEventTriggerBehavior RoutedEvent="{x:Static Button.ClickEvent}">
+																		<InvokeCommandAction Command="{Binding RequestHardwareDetails}"/>
+																	</RoutedEventTriggerBehavior>
+																</Interaction.Behaviors>
+																<TextBlock Text="{Binding Name, Mode=OneWay}"
+																		   Theme="{StaticResource HardwareText}"/>
+															</Button>
 														</ContentControl.Content>
 													</ContentControl>
 

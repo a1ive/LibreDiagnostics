@@ -699,4 +699,25 @@
   <data name="StoragePowerOnHoursTooltip" xml:space="preserve">
     <value>Power on hours of storage device.</value>
   </data>
+  <data name="RAMWindowTitle" xml:space="preserve">
+    <value>RAM details</value>
+  </data>
+  <data name="RAMTimingsHeader" xml:space="preserve">
+    <value>RAM Timings</value>
+  </data>
+  <data name="RAMTimingsHeaderTooltip" xml:space="preserve">
+    <value>Timings of this RAM module.</value>
+  </data>
+  <data name="RAMTimingsName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="RAMTimingsValue" xml:space="preserve">
+    <value>Value in nanoseconds</value>
+  </data>
+  <data name="RAMCapacity" xml:space="preserve">
+    <value>Capacity in GB</value>
+  </data>
+  <data name="RAMCapacityTooltip" xml:space="preserve">
+    <value>Capacity of RAM module in GB.</value>
+  </data>
 </root>

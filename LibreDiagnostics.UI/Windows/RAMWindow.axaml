@@ -1,0 +1,73 @@
+<local:FlatWindow xmlns="https://github.com/avaloniaui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		          xmlns:local="using:LibreDiagnostics.UI.Windows"
+		          xmlns:lang="clr-namespace:LibreDiagnostics.Language.Resources;assembly=LibreDiagnostics.Language"
+                  xmlns:ctrl="using:BlackSharp.UI.Avalonia.Controls"
+				  xmlns:vm="clr-namespace:LibreDiagnostics.MVVM.ViewModels;assembly=LibreDiagnostics.MVVM"
+                  xmlns:global="clr-namespace:LibreDiagnostics.Models.Globals;assembly=LibreDiagnostics.Models"
+                  xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+				  xmlns:cfg="using:LibreDiagnostics.Models.Configuration"
+				  xmlns:dt="using:LibreDiagnostics.UI.Controls.Templates"
+				  xmlns:enums="clr-namespace:LibreDiagnostics.Models.Enums;assembly=LibreDiagnostics.Models"
+				  xmlns:ava="clr-namespace:BlackSharp.UI.Avalonia.Data;assembly=BlackSharp.UI.Avalonia"
+                  mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+                  x:Class="LibreDiagnostics.UI.Windows.RAMWindow"
+				  x:DataType="vm:RAMViewModel"
+                  Title="{x:Static lang:Resources.RAMWindowTitle}" WindowStartupLocation="CenterScreen"
+                  Theme="{StaticResource FlatWindowStyle}" Width="600" Height="450"
+                  Icon="avares://LibreDiagnostics.UI/Assets/Icon.ico"
+                  TitleIcon="avares://LibreDiagnostics.UI/Assets/Icon.ico"
+				  Foreground="{Binding FontColor, Source={x:Static global:Global.Settings}, Mode=OneWay}"
+                  Background="{Binding BackgroundColor, Source={x:Static global:Global.Settings}, Converter={StaticResource StringToColorConverter}, Mode=OneWay}"
+                  ShowTitleBar="True" ShowTitle="True" ShowIcon="True" ShowClose="True" CanResize="True">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MockRAMViewModel/>
+    </Design.DataContext>
+
+	<Window.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+	</Window.Styles>
+
+    <Grid Margin="20" RowDefinitions="Auto,Auto,*">
+		<Grid.Styles>
+			<Style Selector="TextBox">
+				<Setter Property="FontFamily" Value="{Binding FontFamily, Source={x:Static global:Global.Settings}, Converter={StaticResource StringToFontFamilyConverter}, Mode=OneWay}"/>
+			</Style>
+		</Grid.Styles>
+
+		<ctrl:GridEx Grid.Row="0" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*,Auto,*">
+			<TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static lang:Resources.RAMCapacity}"/>
+			<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Capacity.Value}" IsReadOnly="True"
+					 ToolTip.Tip="{x:Static lang:Resources.RAMCapacityTooltip}"/>
+		</ctrl:GridEx>
+
+		<TextBlock Grid.Row="1" Text="{x:Static lang:Resources.RAMTimingsHeader}" Margin="0,20,0,10"
+				   ToolTip.Tip="{x:Static lang:Resources.RAMTimingsHeaderTooltip}">
+			<TextBlock.FontSize>
+				<ava:ScaleFontBinding Factor="2" Path="GlobalFontSize" Source="{x:Static global:Global.FontManager}"/>
+			</TextBlock.FontSize>
+		</TextBlock>
+
+		<DataGrid Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
+				  CanUserResizeColumns="True"
+				  ItemsSource="{Binding Timings}">
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="{x:Static lang:Resources.RAMTimingsName}" Binding="{Binding Name}"/>
+				<DataGridTemplateColumn Header="{x:Static lang:Resources.RAMTimingsValue}" SortMemberPath="Value">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Value}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+			</DataGrid.Columns>
+		</DataGrid>
+    </Grid>
+</local:FlatWindow>

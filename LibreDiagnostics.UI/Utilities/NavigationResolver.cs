@@ -33,6 +33,7 @@ namespace LibreDiagnostics.UI.Utilities
             MessageBro.GetScreens += GetScreens;
 
             EventDistributor.ShowDriveDetailsEvent += ShowDriveDetails;
+            EventDistributor.ShowRAMDetailsEvent += ShowRAMDetails;
         }
 
         #endregion
@@ -125,6 +126,19 @@ namespace LibreDiagnostics.UI.Utilities
                 {
                     new Windows.StorageWindow(sd).Show();
                 }
+            }
+        }
+
+        static void ShowRAMDetails(IHardware hardware)
+        {
+            if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime wnd
+             && wnd.MainWindow != null)
+            {
+                new Windows.RAMWindow(hardware).ShowDialog(wnd.MainWindow);
+            }
+            else
+            {
+                new Windows.RAMWindow(hardware).Show();
             }
         }
 

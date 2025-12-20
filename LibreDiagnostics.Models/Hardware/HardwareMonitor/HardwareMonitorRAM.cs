@@ -9,6 +9,7 @@
 
 using LibreDiagnostics.Models.Configuration;
 using LibreDiagnostics.Models.Enums;
+using LibreDiagnostics.Models.Events;
 using LibreDiagnostics.Models.Globals;
 using LibreDiagnostics.Models.Hardware.Metrics;
 using LibreHardwareMonitor.Hardware;
@@ -28,6 +29,15 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
 
             //Initial call to apply settings
             OnSettingsChanged(this, new(Global.Settings));
+        }
+
+        #endregion
+
+        #region Protected
+
+        protected override void OnRequestHardwareDetails()
+        {
+            EventDistributor.ShowRAMDetails(Hardware);
         }
 
         #endregion

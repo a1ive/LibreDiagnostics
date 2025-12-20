@@ -699,4 +699,25 @@
   <data name="StoragePowerOnHoursTooltip" xml:space="preserve">
     <value>Gibt an wie viele Stunden die Festplatte gelaufen ist.</value>
   </data>
+  <data name="RAMWindowTitle" xml:space="preserve">
+    <value>Arbeitsspeicher Details</value>
+  </data>
+  <data name="RAMTimingsHeader" xml:space="preserve">
+    <value>Arbeitsspeicher Timings</value>
+  </data>
+  <data name="RAMTimingsHeaderTooltip" xml:space="preserve">
+    <value>Timings von diesem Arbeitsspeichermodul.</value>
+  </data>
+  <data name="RAMTimingsName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="RAMTimingsValue" xml:space="preserve">
+    <value>Wert in Nanosekunden</value>
+  </data>
+  <data name="RAMCapacity" xml:space="preserve">
+    <value>Kapazität in GB</value>
+  </data>
+  <data name="RAMCapacityTooltip" xml:space="preserve">
+    <value>Kapazität des Arbeitsspeichermoduls in GB.</value>
+  </data>
 </root>

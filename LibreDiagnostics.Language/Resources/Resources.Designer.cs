@@ -673,6 +673,24 @@ namespace LibreDiagnostics.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Capacity in GB.
+        /// </summary>
+        public static string RAMCapacity {
+            get {
+                return ResourceManager.GetString("RAMCapacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Capacity of RAM module in GB..
+        /// </summary>
+        public static string RAMCapacityTooltip {
+            get {
+                return ResourceManager.GetString("RAMCapacityTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RAM Clock.
         /// </summary>
         public static string RAMClock {
@@ -745,6 +763,42 @@ namespace LibreDiagnostics.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RAM Timings.
+        /// </summary>
+        public static string RAMTimingsHeader {
+            get {
+                return ResourceManager.GetString("RAMTimingsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timings of this RAM module..
+        /// </summary>
+        public static string RAMTimingsHeaderTooltip {
+            get {
+                return ResourceManager.GetString("RAMTimingsHeaderTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string RAMTimingsName {
+            get {
+                return ResourceManager.GetString("RAMTimingsName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value in nanoseconds.
+        /// </summary>
+        public static string RAMTimingsValue {
+            get {
+                return ResourceManager.GetString("RAMTimingsValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Used.
         /// </summary>
         public static string RAMUsed {
@@ -777,6 +831,15 @@ namespace LibreDiagnostics.Language.Resources {
         public static string RAMVoltageLabel {
             get {
                 return ResourceManager.GetString("RAMVoltageLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RAM details.
+        /// </summary>
+        public static string RAMWindowTitle {
+            get {
+                return ResourceManager.GetString("RAMWindowTitle", resourceCulture);
             }
         }
         

@@ -7,6 +7,7 @@
 *
 */
 
+using LibreHardwareMonitor.Hardware;
 using LibreHardwareMonitor.Hardware.Storage;
 
 namespace LibreDiagnostics.Models.Events
@@ -20,11 +21,17 @@ namespace LibreDiagnostics.Models.Events
             ShowDriveDetailsEvent?.Invoke(storage);
         }
 
+        public static void ShowRAMDetails(IHardware hardware)
+        {
+            ShowRAMDetailsEvent?.Invoke(hardware);
+        }
+
         #endregion
 
         #region Events
 
         public static event Action<StorageDevice> ShowDriveDetailsEvent;
+        public static event Action<IHardware> ShowRAMDetailsEvent;
 
         #endregion
     }
