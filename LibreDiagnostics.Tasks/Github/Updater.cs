@@ -161,6 +161,12 @@ namespace LibreDiagnostics.Tasks.Github
             //Extract update
             ZipFile.ExtractToDirectory(updateFilePath, appPath, true);
 
+            //SharpCompress (for later):
+            //using var file = File.OpenRead(updateFilePath);
+            //using var stream = SharpCompressStream.Create(file);
+            //using var archive = ArchiveFactory.Open(stream);
+            //archive.ExtractToDirectory(appPath); //Has progress reporting: could add dialog, or something else, to show progress
+
             if (removeUpdateFile)
             {
                 //Remove update file
