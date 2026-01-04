@@ -184,72 +184,71 @@ namespace LibreDiagnostics.Models.Hardware
                     }
                 }
 
-                e.NewSettings.HardwareMonitorConfigs
-                    .ForEach(cfg =>
+                foreach (var cfg in e.NewSettings.HardwareMonitorConfigs)
+                {
+                    var addOrRemoveConfig = new Action<HardwareMonitorConfig>(cgf =>
                     {
-                        var addOrRemoveConfig = new Action<HardwareMonitorConfig>(cgf =>
+                        using (var guard = new LockGuard(_HardwarePanelsLock))
                         {
-                            using (var guard = new LockGuard(_HardwarePanelsLock))
+                            //Create new panel to use new sensors
+                            if (cfg.Enabled)
                             {
-                                //Create new panel to use new sensors
-                                if (cfg.Enabled)
-                                {
-                                    HardwarePanels.TryInsert(cfg.Order, CreatePanel(cfg));
-                                }
-                                else //Remove panel
-                                {
-                                    HardwarePanels.Remove(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
-                                }
+                                HardwarePanels.TryInsert(cfg.Order, CreatePanel(cfg));
                             }
-                        });
-
-                        switch (cfg.HardwareMonitorType)
-                        {
-                            case HardwareMonitorType.CPU:
-                                if (_Computer.IsCpuEnabled != cfg.Enabled)
-                                {
-                                    _Computer.IsCpuEnabled = cfg.Enabled;
-                                    addOrRemoveConfig(cfg);
-                                }
-                                break;
-                            case HardwareMonitorType.RAM:
-                                if (_Computer.IsMemoryEnabled != cfg.Enabled)
-                                {
-                                    _Computer.IsMemoryEnabled = cfg.Enabled;
-                                    addOrRemoveConfig(cfg);
-                                }
-                                break;
-                            case HardwareMonitorType.GPU:
-                                if (_Computer.IsGpuEnabled != cfg.Enabled)
-                                {
-                                    _Computer.IsGpuEnabled = cfg.Enabled;
-                                    addOrRemoveConfig(cfg);
-                                }
-                                break;
-                            case HardwareMonitorType.Storage:
-                                if (_Computer.IsStorageEnabled != cfg.Enabled)
-                                {
-                                    _Computer.IsStorageEnabled = cfg.Enabled;
-                                    addOrRemoveConfig(cfg);
-                                }
-                                break;
-                            case HardwareMonitorType.Network:
-                                if (_Computer.IsNetworkEnabled != cfg.Enabled)
-                                {
-                                    _Computer.IsNetworkEnabled = cfg.Enabled;
-                                    addOrRemoveConfig(cfg);
-                                }
-                                break;
-                            case HardwareMonitorType.Fan:
-                                //No specific setting for fans, they are part of Motherboard
-                                addOrRemoveConfig(cfg);
-                                break;
-                            default:
-                                break;
+                            else //Remove panel
+                            {
+                                HardwarePanels.Remove(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
+                            }
                         }
-
-                        ApplyHardwareConfigChanges(cfg);
                     });
+
+                    switch (cfg.HardwareMonitorType)
+                    {
+                        case HardwareMonitorType.CPU:
+                            if (_Computer.IsCpuEnabled != cfg.Enabled)
+                            {
+                                _Computer.IsCpuEnabled = cfg.Enabled;
+                                addOrRemoveConfig(cfg);
+                            }
+                            break;
+                        case HardwareMonitorType.RAM:
+                            if (_Computer.IsMemoryEnabled != cfg.Enabled)
+                            {
+                                _Computer.IsMemoryEnabled = cfg.Enabled;
+                                addOrRemoveConfig(cfg);
+                            }
+                            break;
+                        case HardwareMonitorType.GPU:
+                            if (_Computer.IsGpuEnabled != cfg.Enabled)
+                            {
+                                _Computer.IsGpuEnabled = cfg.Enabled;
+                                addOrRemoveConfig(cfg);
+                            }
+                            break;
+                        case HardwareMonitorType.Storage:
+                            if (_Computer.IsStorageEnabled != cfg.Enabled)
+                            {
+                                _Computer.IsStorageEnabled = cfg.Enabled;
+                                addOrRemoveConfig(cfg);
+                            }
+                            break;
+                        case HardwareMonitorType.Network:
+                            if (_Computer.IsNetworkEnabled != cfg.Enabled)
+                            {
+                                _Computer.IsNetworkEnabled = cfg.Enabled;
+                                addOrRemoveConfig(cfg);
+                            }
+                            break;
+                        case HardwareMonitorType.Fan:
+                            //No specific setting for fans, they are part of Motherboard
+                            addOrRemoveConfig(cfg);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    ApplyHardwareConfigChanges(cfg);
+                }
             }
             else //Fresh start
             {
