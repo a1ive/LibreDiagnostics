@@ -1888,6 +1888,42 @@ namespace LibreDiagnostics.Language.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Temp Critical.
+        /// </summary>
+        public static string StorageTemperatureCritical {
+            get {
+                return ResourceManager.GetString("StorageTemperatureCritical", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Critical temperature threshold for storage device..
+        /// </summary>
+        public static string StorageTemperatureCriticalTooltip {
+            get {
+                return ResourceManager.GetString("StorageTemperatureCriticalTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Temp Warning.
+        /// </summary>
+        public static string StorageTemperatureWarning {
+            get {
+                return ResourceManager.GetString("StorageTemperatureWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning temperature threshold for storage device..
+        /// </summary>
+        public static string StorageTemperatureWarningTooltip {
+            get {
+                return ResourceManager.GetString("StorageTemperatureWarningTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Storage details.
         /// </summary>
         public static string StorageTitle {
@@ -1933,7 +1969,7 @@ namespace LibreDiagnostics.Language.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A new version is available for download. Would you like to proceed with the update ?.
+        ///   Looks up a localized string similar to A new version is available for download.\nWould you like to proceed with the update ?\n\nRelease notes:\n{0}.
         /// </summary>
         public static string UpdateAvailableMessage {
             get {

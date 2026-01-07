@@ -55,9 +55,10 @@ namespace LibreDiagnostics.Tasks.Github
         /// <remarks>This method retrieves the latest release information from a remote API and compares it to the provided version.<br/>
         /// Network connectivity is required for this operation.</remarks>
         /// <param name="currentVersion">The current version of the application to compare against the latest available release. Cannot be null.</param>
+        /// <param name="releaseNotes">The release notes of the latest version if available; otherwise, null.</param>
         /// <returns>A task that represents the asynchronous operation.<br/>
         /// The task result is <see langword="true"/> if a newer version is available; otherwise, <see langword="false"/>.</returns>
-        public async Task<bool> IsUpdateAvailable(Version currentVersion)
+        public async Task<UpdateCheckResult> IsUpdateAvailable(Version currentVersion)
         {
             using var client = CreateHttpClient();
             using var cts = new CancellationTokenSource(Timeout);
@@ -74,10 +75,17 @@ namespace LibreDiagnostics.Tasks.Github
             //Check version
             if (latestVersion <= currentVersion)
             {
-                return false;
+                return new(false, null);
             }
 
-            return true;
+            string releaseNotes = null;
+
+            if (root.TryGetProperty("body", out var body))
+            {
+                releaseNotes = body.GetString();
+            }
+
+            return new(true, releaseNotes);
         }
 
         /// <summary>
@@ -198,6 +206,12 @@ namespace LibreDiagnostics.Tasks.Github
             await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             await resp.Content.CopyToAsync(fs);
         }
+
+        #endregion
+
+        #region Records
+
+        public sealed record UpdateCheckResult(bool IsUpdateAvailable, string ReleaseNotes);
 
         #endregion
     }

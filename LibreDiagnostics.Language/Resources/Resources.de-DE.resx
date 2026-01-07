@@ -655,7 +655,7 @@
     <value>Neue Version verfügbar</value>
   </data>
   <data name="UpdateAvailableMessage" xml:space="preserve">
-    <value>Eine neue Version ist zum Download verfügbar. Möchtest du mit dem Update fortfahren ?</value>
+    <value>Eine neue Version ist zum Download verfügbar.\nMöchtest du mit dem Update fortfahren ?\n\nVersionshinweise:\n{0}</value>
   </data>
   <data name="ButtonApply" xml:space="preserve">
     <value>Anwenden</value>
@@ -746,5 +746,17 @@
   </data>
   <data name="RAMNameTooltip" xml:space="preserve">
     <value>Name des Arbeitsspeichermoduls.</value>
+  </data>
+  <data name="StorageTemperatureWarning" xml:space="preserve">
+    <value>Temp Warnung</value>
+  </data>
+  <data name="StorageTemperatureWarningTooltip" xml:space="preserve">
+    <value>Warnung Temperaturgrenze für die Festplatte.</value>
+  </data>
+  <data name="StorageTemperatureCritical" xml:space="preserve">
+    <value>Temp Kritisch</value>
+  </data>
+  <data name="StorageTemperatureCriticalTooltip" xml:space="preserve">
+    <value>Kritische Temperaturgrenze für die Festplatte.</value>
   </data>
 </root>

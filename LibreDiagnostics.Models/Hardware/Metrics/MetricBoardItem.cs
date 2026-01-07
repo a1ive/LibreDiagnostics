@@ -45,6 +45,11 @@ namespace LibreDiagnostics.Models.Hardware.Metrics
             }
         }
 
+        public bool HasSensor(ISensor other)
+        {
+            return ReferenceEquals(Sensor, other);
+        }
+
         #endregion
     }
 }

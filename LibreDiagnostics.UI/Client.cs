@@ -117,39 +117,47 @@ namespace LibreDiagnostics.UI
                     var version = Assembly.GetEntryAssembly()?.GetName().Version;
 
                     //Check if an update is available
-                    if (version != null && await updater.IsUpdateAvailable(version))
+                    if (version != null)
                     {
-                        //Ask user for confirmation if needed
-                        if (askForConfirmation)
-                        {
-                            //Ask user for confirmation with a timeout
-                            var result = MessageBro.DoShowMessageTimeout(Resources.UpdateAvailableTitle, Resources.UpdateAvailableMessage, DialogButtons.YesNo, TimeSpan.FromSeconds(UpdateConfirmationTimeoutSeconds), out var timeouted);
+                        var updateCheckResult = await updater.IsUpdateAvailable(version);
 
-                            //If user declined or timeouted, abort update
-                            if (timeouted || result == DialogButtonType.No)
+                        if (updateCheckResult.IsUpdateAvailable)
+                        {
+                            //Ask user for confirmation if needed
+                            if (askForConfirmation)
                             {
-                                return;
+                                //Format message to include release notes
+                                var message = string.Format(Resources.UpdateAvailableMessage.Replace(@"\n", Environment.NewLine), updateCheckResult.ReleaseNotes);
+
+                                //Ask user for confirmation with a timeout
+                                var result = MessageBro.DoShowMessageTimeout(Resources.UpdateAvailableTitle, message, DialogButtons.YesNo, TimeSpan.FromSeconds(UpdateConfirmationTimeoutSeconds), out var timeouted);
+
+                                //If user declined or timeouted, abort update
+                                if (timeouted || result == DialogButtonType.No)
+                                {
+                                    return;
+                                }
                             }
-                        }
 
-                        //Construct arguments
-                        List<string> args = [$"{LDUpdater.CallingApplicationArg}=\"{Environment.ProcessPath}\"", LDUpdater.StartUpdateArg];
+                            //Construct arguments
+                            List<string> args = [$"{LDUpdater.CallingApplicationArg}=\"{Environment.ProcessPath}\"", LDUpdater.StartUpdateArg];
 
-                        //Start updater
-                        if (OS.IsWindows())
-                        {
-                            Process.Start(UpdaterWindows, args);
-                        }
-                        else if (OS.IsLinux())
-                        {
-                            Process.Start(UpdaterLinux, args);
-                        }
-                        else
-                        {
-                            Logger.Instance.Add(LogLevel.Warn, $"{nameof(TryUpdate)}: OS unsupported", DateTime.Now);
-                        }
+                            //Start updater
+                            if (OS.IsWindows())
+                            {
+                                Process.Start(UpdaterWindows, args);
+                            }
+                            else if (OS.IsLinux())
+                            {
+                                Process.Start(UpdaterLinux, args);
+                            }
+                            else
+                            {
+                                Logger.Instance.Add(LogLevel.Warn, $"{nameof(TryUpdate)}: OS unsupported", DateTime.Now);
+                            }
 
-                        Environment.Exit(666);
+                            Environment.Exit(666);
+                        }
                     }
                 }
             }

@@ -655,7 +655,7 @@
     <value>New version available</value>
   </data>
   <data name="UpdateAvailableMessage" xml:space="preserve">
-    <value>A new version is available for download. Would you like to proceed with the update ?</value>
+    <value>A new version is available for download.\nWould you like to proceed with the update ?\n\nRelease notes:\n{0}</value>
   </data>
   <data name="ButtonApply" xml:space="preserve">
     <value>Apply</value>
@@ -746,5 +746,17 @@
   </data>
   <data name="RAMNameTooltip" xml:space="preserve">
     <value>Name of RAM module.</value>
+  </data>
+  <data name="StorageTemperatureWarning" xml:space="preserve">
+    <value>Temp Warning</value>
+  </data>
+  <data name="StorageTemperatureWarningTooltip" xml:space="preserve">
+    <value>Warning temperature threshold for storage device.</value>
+  </data>
+  <data name="StorageTemperatureCritical" xml:space="preserve">
+    <value>Temp Critical</value>
+  </data>
+  <data name="StorageTemperatureCriticalTooltip" xml:space="preserve">
+    <value>Critical temperature threshold for storage device.</value>
   </data>
 </root>

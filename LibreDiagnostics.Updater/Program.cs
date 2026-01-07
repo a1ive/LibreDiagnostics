@@ -55,8 +55,10 @@ args = new string[3] { "--calling-app=\"C:/Code/LibreDiagnostics/LibreDiagnostic
 
                 var updater = new LDUpdater(Constants.Owner, Constants.Repository);
 
+                var updateCheckResult = await updater.IsUpdateAvailable(versionOfMyself);
+
                 //If no update is available, exit
-                if (!await updater.IsUpdateAvailable(versionOfMyself))
+                if (!updateCheckResult.IsUpdateAvailable)
                 {
                     Environment.Exit(666);
                 }

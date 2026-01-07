@@ -9,7 +9,7 @@
 
 #pragma warning disable CA1416 // Platform compatibility warning
 
-using BlackSharp.Core.Converters;
+using BlackSharp.Core.Collections;
 using BlackSharp.Core.Extensions;
 using DiskInfoToolkit;
 using LibreDiagnostics.Models.Configuration;
@@ -17,6 +17,7 @@ using LibreDiagnostics.Models.Enums;
 using LibreDiagnostics.Models.Events;
 using LibreDiagnostics.Models.Globals;
 using LibreDiagnostics.Models.Hardware.Metrics;
+using LibreDiagnostics.Models.Interfaces;
 using LibreHardwareMonitor.Hardware;
 using LibreHardwareMonitor.Hardware.Storage;
 
@@ -29,7 +30,6 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
         public HardwareMonitorDrive(IHardware hardware, HardwareConfig config)
             : base(hardware, config)
         {
-            //Get underlying Storage object via reflection
             var sd = Hardware as StorageDevice;
             _Storage = sd.Storage;
 
@@ -47,9 +47,14 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
 
         readonly Storage _Storage;
 
+        ISensor _FreeSize;
+        ISensor _TotalSize;
+
         #endregion
 
         #region Properties
+
+        bool ShouldLoadBarBeEnabled => LoadMetric != null;
 
         MetricBase _LoadMetric;
         public MetricBase LoadMetric
@@ -63,13 +68,6 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
         {
             get { return _UsedMetric; }
             set { SetField(ref _UsedMetric, value); }
-        }
-
-        MetricBase _FreeMetric;
-        public MetricBase FreeMetric
-        {
-            get { return _FreeMetric; }
-            set { SetField(ref _FreeMetric, value); }
         }
 
         DriveLayout _DriveLayout;
@@ -88,10 +86,10 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
             if (Hardware is StorageDevice sd)
             {
                 var driveLettersForStorageDevice = _Storage.Partitions
-                                                        .Where(p => p.DriveLetter is not null)
-                                                        .OrderBy(p => p.DriveLetter)
-                                                        .Select(p => $"{p.DriveLetter.Value}:")
-                                                        .ToList();
+                    .Where(p => p.DriveLetter is not null)
+                    .OrderBy(p => p.DriveLetter)
+                    .Select(p => $"{p.DriveLetter.Value}:")
+                    .ToList();
 
                 if (driveLettersForStorageDevice.Count > 0)
                 {
@@ -102,32 +100,16 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
                     Name = Hardware.Name;
                 }
 
-                var freeBytes = _Storage.TotalFreeSize.GetValueOrDefault();
-                var usedBytes = _Storage.TotalSize - freeBytes;
-                float usedPercent = 0f;
+                //Re-check for toggled sensors (Free Space & Used Space)
+                TrySetFreeSizeSensor(HardwareMetrics);
+                TrySetUsageSensor(HardwareMetrics);
 
-                if (_Storage.TotalSize > 0)
+                if (UsedMetric != null && _FreeSize != null)
                 {
-                    usedPercent = 100.0f - (100.0f * freeBytes / _Storage.TotalSize);
-                }
-                else
-                {
-                    usedPercent = 100.0f;
-                }
+                    var used = _TotalSize.Value.GetValueOrDefault() - _FreeSize.Value.GetValueOrDefault();
 
-                if (LoadMetric != null)
-                {
-                    LoadMetric.Update(usedPercent);
-                }
-
-                if (UsedMetric != null)
-                {
-                    UsedMetric.Update((double)DataStorageSizeConverter.ByteToGigabyte(usedBytes));
-                }
-
-                if (FreeMetric != null)
-                {
-                    FreeMetric.Update((double)DataStorageSizeConverter.ByteToGigabyte(freeBytes));
+                    //UsedMetric.Update((double)DataStorageSizeConverter.ByteToGigabyte((ulong)usedBytes));
+                    UsedMetric.Update(used);
                 }
             }
 
@@ -149,24 +131,26 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
 
         void Initialize()
         {
-            var hardwareMetricList = new List<MetricBase>();
+            var hardwareMetricList = new ObservableCollectionEx<IHardwareMetric>();
+
+            //Total Size (for calculation)
+            {
+                _TotalSize = Hardware.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Data && s.Index == 32);
+            }
 
             //Drive Load
             {
-                LoadMetric = new MetricBase(HardwareMetricKey.DriveLoad, DataType.Percent);
-                hardwareMetricList.Add(LoadMetric);
+                TrySetUsageSensor(hardwareMetricList);
             }
 
             //Drive Used
             {
-                UsedMetric = new MetricBase(HardwareMetricKey.DriveUsed, DataType.Gigabyte);
-                hardwareMetricList.Add(UsedMetric);
+                //Moved into toggle method for Free Size sensor (dependent)
             }
 
             //Drive Free
             {
-                FreeMetric = new MetricBase(HardwareMetricKey.DriveFree, DataType.Gigabyte);
-                hardwareMetricList.Add(FreeMetric);
+                TrySetFreeSizeSensor(hardwareMetricList);
             }
 
             //Drive Read
@@ -199,6 +183,58 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
 
             HardwareMetrics.Clear();
             HardwareMetrics.AddRange(hardwareMetricList);
+        }
+
+        void TrySetFreeSizeSensor(ObservableCollectionEx<IHardwareMetric> hardwareMetricList)
+        {
+            //Try find sensor
+            var freeSizeSensor = Hardware.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Data && s.Index == 31);
+
+            //Toggled off
+            if (_FreeSize != null && freeSizeSensor == null)
+            {
+                hardwareMetricList.Remove(mb => mb is MetricBoardItem mbi && mbi.HasSensor(_FreeSize));
+                _FreeSize = null;
+
+                hardwareMetricList.Remove(UsedMetric);
+                UsedMetric = null;
+            }
+
+            //Toggled on OR initial setup
+            if (_FreeSize == null && freeSizeSensor != null)
+            {
+                _FreeSize = freeSizeSensor;
+                hardwareMetricList.Add(new MetricBoardItem(_FreeSize, HardwareMetricKey.DriveFree, DataType.Gigabyte) /*{ Converter = ConverterFactory.GetConverterShared<ByteToGigabyteConverter>() }*/);
+
+                UsedMetric = new MetricBase(HardwareMetricKey.DriveUsed, DataType.Gigabyte);
+                hardwareMetricList.Add(UsedMetric);
+            }
+        }
+
+        void TrySetUsageSensor(ObservableCollectionEx<IHardwareMetric> hardwareMetricList)
+        {
+            //Try find sensor
+            var driveLoadSensor = Hardware.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Load && s.Index == 30);
+
+            //Toggled off
+            if (LoadMetric != null && driveLoadSensor == null)
+            {
+                hardwareMetricList.Remove(LoadMetric);
+                LoadMetric = null;
+
+                //Remove Load Bar
+                DriveLayout = DriveLayout.NoLoadBar;
+            }
+
+            //Toggled on OR initial setup
+            if (LoadMetric == null && driveLoadSensor != null)
+            {
+                LoadMetric = new MetricBoardItem(driveLoadSensor, HardwareMetricKey.DriveLoad, DataType.Percent);
+                hardwareMetricList.Add(LoadMetric);
+
+                //Add Load Bar
+                DriveLayout = DriveLayout.LoadBarStacked;
+            }
         }
 
         void OnSettingsChanged(object sender, SettingsChangedEventArgs e)
@@ -239,7 +275,7 @@ namespace LibreDiagnostics.Models.Hardware.HardwareMonitor
 
             //Set Load Bar layout
             bool loadBarEnabled = e.NewSettings.IsConfigEnabled(HardwareMonitorType.Storage, HardwareMetricKey.DriveLoadBar);
-            if (loadBarEnabled)
+            if (loadBarEnabled && ShouldLoadBarBeEnabled)
             {
                 DriveLayout = DriveLayout.LoadBarStacked;
             }
