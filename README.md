@@ -6,7 +6,7 @@
 [![GitHub license](https://img.shields.io/github/license/blacktempel/LibreDiagnostics?label=License)](https://github.com/blacktempel/librediagnostics/blob/master/LICENSE)
 [![Build master](https://github.com/Blacktempel/LibreDiagnostics/actions/workflows/master.yml/badge.svg)](https://github.com/Blacktempel/LibreDiagnostics/actions/workflows/master.yml)
 ![GitHub all releases](https://img.shields.io/github/downloads/Blacktempel/LibreDiagnostics/total?label=Downloads)
-![GitHub release](https://img.shields.io/github/v/release/Blacktempel/LibreDiagnostics?label=Version)
+[![GitHub release](https://img.shields.io/github/v/release/Blacktempel/LibreDiagnostics?label=Version)](https://github.com/Blacktempel/LibreDiagnostics/releases/latest)
 
 A desktop utility for real-time hardware monitoring and diagnostics.
 
