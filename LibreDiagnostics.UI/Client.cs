@@ -145,11 +145,17 @@ namespace LibreDiagnostics.UI
                             //Start updater
                             if (OS.IsWindows())
                             {
-                                Process.Start(UpdaterWindows, args);
+                                Process.Start(new ProcessStartInfo(UpdaterWindows, args)
+                                {
+                                    CreateNoWindow = true,
+                                });
                             }
                             else if (OS.IsLinux())
                             {
-                                Process.Start(UpdaterLinux, args);
+                                Process.Start(new ProcessStartInfo(UpdaterLinux, args)
+                                {
+                                    CreateNoWindow = true,
+                                });
                             }
                             else
                             {

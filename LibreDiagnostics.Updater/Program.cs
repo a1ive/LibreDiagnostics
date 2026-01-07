@@ -65,8 +65,17 @@ args = new string[3] { "--calling-app=\"C:/Code/LibreDiagnostics/LibreDiagnostic
 
                 //Get required assemblies
                 var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(a => a.Location.StartsWith(currentDirectory))
+                    .Where(a => a.Location.StartsWith(currentDirectory, StringComparison.OrdinalIgnoreCase))
                     .Select(a => a.Location)
+                    .ToList();
+
+                //Get file name without extension
+                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(currentFilePath);
+
+                //Get required files, based on file name
+                var files = Directory
+                    .EnumerateFiles(currentDirectory)
+                    .Where(f => f.StartsWith(fileNameWithoutExtension, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
                 //Create temp directory
@@ -86,8 +95,18 @@ args = new string[3] { "--calling-app=\"C:/Code/LibreDiagnostics/LibreDiagnostic
                     File.Copy(assembly, destination);
                 });
 
+                //Copy required files
+                files.ForEach(file =>
+                {
+                    var destination = Path.Combine(tempDir.FullName, Path.GetFileName(file));
+                    File.Copy(file, destination, false); //Do not overwrite, only copy missing files
+                });
+
                 //Start updater from temp directory
-                Process.Start(targetUpdaterPath, [$"{LDUpdater.CallingApplicationArg}=\"{callingApplication}\"", LDUpdater.StartSelfUpdateArg, $"{LDUpdater.SourceDirectoryArg}=\"{currentDirectory}\""]);
+                Process.Start(new ProcessStartInfo(targetUpdaterPath, [$"{LDUpdater.CallingApplicationArg}=\"{callingApplication}\"", LDUpdater.StartSelfUpdateArg, $"{LDUpdater.SourceDirectoryArg}=\"{currentDirectory}\""])
+                {
+                    CreateNoWindow = true,
+                });
             }
             //Start self-update process
             else if (args.Length == 3
