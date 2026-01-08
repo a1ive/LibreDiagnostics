@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Files**
 Please add following files to your bug report:
-- log file (located within the directory of the application)
+- log file[s] (located within the directory of the application)
 - settings (see README for location)
 
 **System information (please complete the following information):**

@@ -55,6 +55,7 @@ namespace LibreDiagnostics.UI
             //Enable logging
             Logger.Instance.IsEnabled = true;
             Logger.Instance.LogLevel = LogLevel.Info;
+            LoggerUtilities.SetLogFilePath(DateTime.Now);
 
             //Construct version information
             var assembly = Assembly.GetEntryAssembly();

@@ -365,6 +365,8 @@ namespace LibreDiagnostics.Models.Hardware
         {
             if (hardware.HardwareType == HardwareType.Storage)
             {
+                Logger.Instance.Add(LogLevel.Trace, $"{nameof(OnHardwareAdded)}: '{hardware.Name}'", DateTime.Now);
+
                 OnStoragesChanged();
             }
             else
@@ -377,6 +379,8 @@ namespace LibreDiagnostics.Models.Hardware
         {
             if (hardware.HardwareType == HardwareType.Storage)
             {
+                Logger.Instance.Add(LogLevel.Trace, $"{nameof(OnHardwareRemoved)}: '{hardware.Name}'", DateTime.Now);
+
                 OnStoragesChanged();
             }
             else
@@ -393,19 +397,18 @@ namespace LibreDiagnostics.Models.Hardware
             {
                 using (var guard = new LockGuard(_HardwarePanelsLock))
                 {
-                    var countBeforeRemove = HardwarePanels.Count(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
+                    //Create temporary list to avoid multiple notifications and possible UI duplication of a panel
+                    //Notify events are not required for temp list
+                    var tempList = new ObservableCollectionEx<HardwarePanel>(HardwarePanels) { AreNotifyEventsEnabled = false };
 
-                    //Remove old panel and add new one with updated hardware list
-                    HardwarePanels.Remove(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
+                    //Remove old panel
+                    tempList.Remove(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
 
-                    var countAfterRemove = HardwarePanels.Count(hp => hp.HardwareMonitorType == cfg.HardwareMonitorType);
+                    //Add new panel with updated hardware list
+                    tempList.TryInsert(cfg.Order, CreatePanel(cfg));
 
-                    if (countBeforeRemove != 1 || countAfterRemove != 0)
-                    {
-                        Logger.Instance.Add(LogLevel.Warn, $"{nameof(OnStoragesChanged)}: Unexpected HWP count before/after remove: {countBeforeRemove}/{countAfterRemove}.", DateTime.Now);
-                    }
-
-                    HardwarePanels.TryInsert(cfg.Order, CreatePanel(cfg));
+                    //Assign updated list back to property
+                    HardwarePanels = new(tempList);
                 }
             }
         }

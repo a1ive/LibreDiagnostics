@@ -15,15 +15,26 @@ namespace LibreDiagnostics.Models.Logging
     {
         #region Fields
 
-        public const string LogFile = $"AppLog{nameof(LibreDiagnostics)}.txt";
+        const string LogFolder = "AppLogs";
+        static string LogFile = string.Empty;
 
         #endregion
 
         #region Public
 
+        public static void SetLogFilePath(DateTime dateTime)
+        {
+            if (!Directory.Exists(LogFolder))
+            {
+                Directory.CreateDirectory(LogFolder);
+            }
+
+            LogFile = Path.Combine(LogFolder, $"{dateTime:yyyyMMdd-HHmmss}_Log.txt");
+        }
+
         public static void SaveLogFile()
         {
-            Logger.Instance.SaveToFile(LogFile);
+            Logger.Instance.SaveToFile(LogFile, false);
         }
 
         #endregion
