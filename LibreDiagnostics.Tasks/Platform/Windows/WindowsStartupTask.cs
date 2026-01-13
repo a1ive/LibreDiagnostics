@@ -50,11 +50,13 @@ namespace LibreDiagnostics.Tasks.Platform.Windows
         {
             try
             {
+                var workingDirectory = Path.GetDirectoryName(exePath ?? ProcessPath);
+
                 using (var taskService = new TaskService())
                 {
                     TaskDefinition def = taskService.NewTask();
                     def.Triggers.Add(new LogonTrigger() { Enabled = true });
-                    def.Actions.Add(new ExecAction(exePath ?? ProcessPath));
+                    def.Actions.Add(new ExecAction(exePath ?? ProcessPath, null, workingDirectory));
                     def.Principal.RunLevel = TaskRunLevel.Highest;
 
                     def.Settings.DisallowStartIfOnBatteries = false;
