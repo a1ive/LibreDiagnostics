@@ -84,6 +84,9 @@ Not all settings and features may be available on other operating systems.
 ## Supported languages
 - English
 - German / Deutsch
+- Japanese
+- Simplified Chinese (China)
+- Traditional Chinese (Taiwan)
 
 Feel free to contribute translations for other languages !
 
